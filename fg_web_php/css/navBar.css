@@ -1,0 +1,16 @@
+.navBarBg {
+    background: #B0E0E0;
+}
+
+.brandDivRelative {
+    position: relative;
+}
+
+.brandLogo {
+    font-family: "GillSansUltra"; 
+    font-size: 35px;
+    display: block;
+    position: absolute;
+    top: 2px;
+    left: 70px;
+}

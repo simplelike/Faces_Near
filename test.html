@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/near-api-js@0.41.0/dist/near-api-js.min.js"></script>
+</head>
+
+<style>
+    .square {
+      width: 100px;
+      height: 100px;
+      float: left;
+      margin: 10px;
+    }
+    .red {
+      background-color: red;
+    }
+    .yellow {
+      background-color: yellow;
+    }
+    .purple {
+      background-color: purple;
+    }
+</style>
+
+<body>
+<div style="height: 150px;">
+  <div id="redSquare" dataColor="red" class="square red"></div>
+  <div id="yellowSquare" dataColor="yellow" class="square yellow"></div>
+  <div id="purpleSquare" dataColor="purple" class="square purple"></div>
+</div>
+ 
+  <button id="signButton">Sign in</button>
+
+  <div id="infoSquareDiv">
+    <h2>Информация о выбранном квадратике</h2>
+    <div id="infoSquareTitleDiv">
+      <span><h3>Цвет квадратика: </h3></span>
+      <span id = "infoSquareTitleSpan"></span>
+    </div>
+    <div id="infoSquareOwnerDiv">
+      <span><h3>Владелец квадратика: </h3></span>
+      <span id = "infoSquareOwnerSpan"></span>
+    </div>
+  </div>
+
+  <div id="infoOwnerDiv">
+    <h2>Информация о пользователе</h2>
+    <div id="infoOwnerTitleDiv">
+      <span><h3>Логин пользователя в NEAR: </h3></span>
+      <span id = "infoOwnerTitleSpan"></span>
+    </div>
+    <div id="infoOwnerElementsDiv">
+      <span><h3>Квадратики пользователя: </h3></span>
+      <span id = "infoOwnerElementsSpan"></span>
+    </div>
+  </div>
+
+  <p id="num"></p>
+  <button id="add-text">Add Text</button>
+  <button id="increment">Increment</button>
+  <button id="decrement">Decrement</button>
+  
+  <script>
+    // connect to NEAR
+    const near = new nearApi.Near({
+      keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore(),
+      networkId: 'testnet',
+      nodeUrl: 'https://rpc.testnet.near.org',
+      walletUrl: 'https://wallet.testnet.near.org'
+    });
+
+    // connect to the NEAR Wallet
+    const wallet = new nearApi.WalletConnection(near, 'my-app');
+
+    // connect to a NEAR smart contract
+    const contract = new nearApi.Contract(wallet.account(), 'simplelike.testnet', {
+      viewMethods: ['get_num'],
+      changeMethods: ['increment', 'decrement', 'reset']
+    });
+
+    const loginButton = $('#signButton');
+
+    if (wallet.isSignedIn()) {
+      loginButton.text(wallet.getAccountId());
+      $('#infoOwnerTitleSpan').html(wallet.getAccountId())
+
+      loginButton.click(function() {
+        wallet.signOut();
+        loginButton.text('SignIn');
+      });
+    }
+    else {
+      loginButton.text('SignIn');
+      $('#infoOwnerTitleSpan').html('Not registered')
+
+      loginButton.click(() => {
+        wallet.requestSignIn({
+          contractId: 'simplelike.testnet',
+          methodNames: ['increment', 'decrement', 'reset', 'get_num']
+        });
+      });
+    }
+    $('.square').click( (e) => {
+      let choosenSquare = $('#'+e.currentTarget.id)
+      let choosenSquareAttr = choosenSquare.attr('dataColor')
+      $('#infoSquareTitleSpan').html(choosenSquareAttr)
+      //alert(choosenSquareAttr)
+    });
+
+    const button = document.getElementById('add-text');
+    if (!wallet.isSignedIn()) {
+      button.textContent = 'SignIn with NEAR'
+    }
+    else {
+      button.textContent = "SignOut"
+    }
+
+    // call the getMessages view method
+    contract.get_num()
+      .then(num => {
+        const p = document.getElementById('num');
+        // messages.forEach(message => {
+        //   const li = document.createElement('li');
+        //   li.textContent = `${message.sender} - ${message.text}`;
+        //   ul.appendChild(li);
+        // })
+        p.textContent = num;
+      });
+    document.getElementById('add-text').addEventListener('click', () => {
+      if (wallet.isSignedIn()) {
+        wallet.signOut();
+      }
+    });
+    // Either sign in or call the addMessage change method on button click
+    document.getElementById('increment').addEventListener('click', () => {
+      if (wallet.isSignedIn()) {
+        contract.increment()
+      } else {
+        wallet.requestSignIn({
+          contractId: 'simplelike.testnet',
+          methodNames: ['increment', 'decrement', 'reset', 'get_num']
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
