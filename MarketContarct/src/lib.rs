@@ -110,7 +110,8 @@ impl Contract {
         //Get price from master account
         let masterData: MasterData =
             serde_json::from_str(&msg).expect("Error in msg in nft_on_transfer");
-        let new_price: u128 = masterData.price.parse().unwrap();
+        let n_p: u128 = masterData.price.parse().unwrap();
+        let new_price = n_p * 1_000_000_000_000_000_000_000_000;
 
         match self.token_index.get(&token_id) {
             Some(stock_id) => {

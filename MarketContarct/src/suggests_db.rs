@@ -31,20 +31,28 @@ pub const GAS_FOR_COMMON_OPERATIONS: Gas = Gas(30_000_000_000_000);
 pub const GAS_RESERVED_FOR_CURRENT_CALL: Gas = Gas(20_000_000_000_000);
 
 #[ext_contract(ext_self)]
-pub trait Master {
+pub trait Market {
     fn on_nft_transfer(&mut self, suggest_id: SuggestId,) -> bool;
+}
+#[ext_contract(ext_master)]
+pub trait Master {
+    fn on_transfer(succeeded:bool, price:U128, owner:AccountId);
 }
 
 #[near_bindgen]
 impl Contract {
-    pub fn make_suggest_for_buying_nft( &mut self, stock_id: StockId, price: Balance) -> bool {
+    
+    #[payable]
+    pub fn make_suggest_for_buying_nft( &mut self, stock_id: StockId) -> bool {
 
         if let Some(stock_entry) = self.stock.get(&stock_id) {
 
             let buyer = env::predecessor_account_id();
+            let price = env::attached_deposit();
+            //env::panic_str(price.to_string().as_str());
             assert_eq!(price > 0, true, "NFT is not available for sale");
             assert_eq!(price <= stock_entry.price, true, "You shouldn't set price higher than seller set");
-
+            
             let new_suggest = SuggestsForNftToken {
                 buyer_acc: buyer.clone(),
                 price: price,
@@ -228,7 +236,7 @@ impl Contract {
 
 #[near_bindgen]
 impl Contract {
-    pub fn getListOfSuggests(&self) -> Vec<SuggestAnnouncementJSON> {
+    pub fn get_list_of_suggests(&self) -> Vec<SuggestAnnouncementJSON> {
         let mut return_value: Vec<SuggestAnnouncementJSON> = Vec::new();
 
         for k_v in self.suggests.iter() {
