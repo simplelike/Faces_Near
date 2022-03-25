@@ -27,6 +27,9 @@ pub struct SuggestAnnouncementJSON {
 const nftAcc: &str = "fg10.testnet";
 const NO_DEPOSIT: Balance = 0;
 
+pub const GAS_FOR_COMMON_OPERATIONS: Gas = Gas(30_000_000_000_000);
+pub const GAS_RESERVED_FOR_CURRENT_CALL: Gas = Gas(20_000_000_000_000);
+
 #[ext_contract(ext_self)]
 pub trait Master {
     fn on_nft_transfer(&mut self, suggest_id: SuggestId,) -> bool;
@@ -122,15 +125,31 @@ impl Contract {
                 let buyer = sug.buyer_acc;
                 let token = stock_entry.token_id;
                 let approval_id = stock_entry.approval_id;
-                ext_nft::nft_transfer(
+
+                let gas_before_call = env::used_gas();
+                let nft_transfer_call =  ext_nft::nft_transfer(
                     buyer.clone(),
                     token.clone(),
                     approval_id.clone(),
                     nftAcc.parse().unwrap(),
-                    env::attached_deposit(),                               //NEAR deposit we attach to the call
-                    Gas(40_000_000_000_000)).then(
-                        ext_self::on_nft_transfer(sug_id.clone(), env::current_account_id(), 0, Gas(40_000_000_000_000))
-                    );
+                    env::attached_deposit(),                   
+                    GAS_FOR_COMMON_OPERATIONS
+                );
+                let gas_before_callback = env::used_gas();
+                let REMAINING_GAS: Gas = env::prepaid_gas() - env::used_gas() - GAS_FOR_COMMON_OPERATIONS - GAS_RESERVED_FOR_CURRENT_CALL;
+
+                let self_callback = ext_self::on_nft_transfer(sug_id.clone(), env::current_account_id(), 0, REMAINING_GAS);
+                let gas_after_callback = env::used_gas();
+                nft_transfer_call.then(self_callback);
+                /*panic!(
+                    "\n{:?}\n{:?}\n{:?}\n{:?}",
+                    env::prepaid_gas(),
+                    gas_before_call,
+                    gas_before_callback,
+                    gas_after_callback
+                );*/
+                return true
+                
             }
             else {
                 env::panic_str("there is no such stock entry");
