@@ -43,11 +43,11 @@ pub trait Master {
 impl Contract {
     
     #[payable]
-    pub fn make_suggest_for_buying_nft( &mut self, stock_id: StockId) -> bool {
+    pub fn make_suggest_for_buying_nft( &mut self, stock_id: StockId, account_id: AccountId) -> bool {
 
         if let Some(stock_entry) = self.stock.get(&stock_id) {
 
-            let buyer = env::predecessor_account_id();
+            let buyer = account_id;
             let price = env::attached_deposit();
             //env::panic_str(price.to_string().as_str());
             assert_eq!(price > 0, true, "NFT is not available for sale");
@@ -121,20 +121,20 @@ impl Contract {
     }
 
     #[payable]
-    pub fn accept_suggest_for_buying_token(&mut self, sug_id: &SuggestId) -> bool {
+    pub fn accept_suggest_for_buying_token(&mut self, sug_id: &SuggestId, account_id: AccountId) -> bool {
         
         if let Some(sug) = self.suggests.get(&sug_id) {
-            let accepter = env::predecessor_account_id();
+            let accepter = account_id;
             let stock_id = sug.id_to_stoke;
 
             if let Some(stock_entry) = self.stock.get(&stock_id) {
                 assert_eq!(stock_entry.sailer, accepter, "Suggest may accept only sailer of token");
+
                 let sold_price = sug.price;
                 let buyer = sug.buyer_acc;
                 let token = stock_entry.token_id;
                 let approval_id = stock_entry.approval_id;
 
-                let gas_before_call = env::used_gas();
                 let nft_transfer_call =  ext_nft::nft_transfer(
                     buyer.clone(),
                     token.clone(),
@@ -143,19 +143,10 @@ impl Contract {
                     env::attached_deposit(),                   
                     GAS_FOR_COMMON_OPERATIONS
                 );
-                let gas_before_callback = env::used_gas();
                 let REMAINING_GAS: Gas = env::prepaid_gas() - env::used_gas() - GAS_FOR_COMMON_OPERATIONS - GAS_RESERVED_FOR_CURRENT_CALL;
 
                 let self_callback = ext_self::on_nft_transfer(sug_id.clone(), env::current_account_id(), 0, REMAINING_GAS);
-                let gas_after_callback = env::used_gas();
                 nft_transfer_call.then(self_callback);
-                /*panic!(
-                    "\n{:?}\n{:?}\n{:?}\n{:?}",
-                    env::prepaid_gas(),
-                    gas_before_call,
-                    gas_before_callback,
-                    gas_after_callback
-                );*/
                 return true
                 
             }
@@ -179,7 +170,11 @@ impl Contract {
                 let token_id = self.stock.get(&stock_id).expect("f: on_nft_tansfer -> there is no stock entry").token_id;
                 let sailer_id = self.stock.get(&stock_id).expect("f: on_nft_tansfer -> there is no stock entry").sailer;
                 
-                self.remove_sug_id_from_id_to_stoke_index(&stock_id, &suggest_id);
+                self.pay_at_unplayed_bets(&stock_id, suggest_id);
+                
+                self.remove_sug_id_with_current_stock_Id(&stock_id);
+                self.id_to_stoke_index.remove(&stock_id);
+                //self.remove_sug_id_from_id_to_stoke_index(&stock_id, &suggest_id);
                 self.remove_sug_id_from_buyer_acc_index(&buyer, &suggest_id);
                 self.suggests.remove(&suggest_id);
 
@@ -216,7 +211,19 @@ impl Contract {
         else {
             return false;
         }
+        
+        return true
     }
+
+    #[private]
+    pub fn remove_sug_id_with_current_stock_Id(&mut self, stock_id: &StockId) {
+        if let Some(set) = self.id_to_stoke_index.get(&stock_id) {
+            for elem_id in set.iter() {
+                self.suggests.remove(&elem_id);
+            }
+        }
+    }
+
     #[private]
     pub fn remove_sug_id_from_buyer_acc_index(&mut self, remover: &AccountId, sug_id: &SuggestId) -> bool {
         if let Some(set) = self.buyer_acc_index.get(&remover) {
@@ -230,6 +237,25 @@ impl Contract {
         }
         else {
             return false;
+        }
+    }
+
+
+    #[private] #[payable]
+    pub fn pay_at_unplayed_bets(&mut self, stock_id: &StockId, played_suggest_id: SuggestId) {
+        if let Some(set) = self.id_to_stoke_index.get(&stock_id) {
+
+            for id in set.iter() {
+                if id == played_suggest_id {
+                    continue;
+                }
+                if let Some(suggest_entry) = self.suggests.get(&id) {
+                    let user = suggest_entry.buyer_acc;
+                    let balance = suggest_entry.price;
+                    Promise::new(user).transfer(balance);
+                }
+            }
+
         }
     }
 }
