@@ -3,24 +3,26 @@ use near_sdk::collections::{UnorderedMap, UnorderedSet};
 use near_sdk::json_types::U128;
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, Promise, ext_contract, near_bindgen, AccountId, Balance, Gas, PromiseResult};
-use std::collections::HashSet;
+//use std::collections::HashSet;
+
 pub type TokenId = String;
-pub type StockId = u128;
-pub type SuggestId = u128;
+pub type DemandId = u128;
 
 /// Helper structure for keys of the persistent collections.
 #[derive(BorshSerialize)]
 pub enum StorageKey {
-    Stock,
-    TokenIndex,
-    SailerIndex,
-    Suggests,
-    IdToStokeIndex,
-    BuyerAccIndex,
-}
+    Offer,
+    OfferAccInd,
+    
+    Demand,
+    DemandTokenInd,
+    DemandAccInd,
 
-mod stock_db;
-mod suggests_db;
+    MaxDemandBid
+}
+mod offer_db;
+/*mod stock_db;
+mod suggests_db;*/
 
 
 #[derive(Serialize, Deserialize)]
@@ -33,17 +35,15 @@ pub struct MasterData {
 #[serde(crate = "near_sdk::serde")]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Announcement {
-    pub token_id: TokenId,
     pub sailer: AccountId,
     pub price: Balance,
-    pub is_it_sale_announcement: bool
 
-    //pub approval_id: u64,
+    pub approval_id: u64,
 }
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct SuggestsForNftToken {
+pub struct DemandForNftToken {
     pub buyer_acc: AccountId,
     pub price: Balance,
 
@@ -53,17 +53,17 @@ pub struct SuggestsForNftToken {
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Contract {
-    //Таблица продаваемых токенов
-    pub stock_id: StockId,
-    pub stock: UnorderedMap<StockId, Announcement>,
-    pub token_index: UnorderedMap<TokenId, UnorderedSet<StockId> >,
-    pub acc_index: UnorderedMap<AccountId, UnorderedSet<StockId>>,
+    //Предложения о продаже
+    pub offer: UnorderedMap<TokenId, Announcement>,
+    pub offer_acc_ind: UnorderedMap<AccountId, UnorderedSet<TokenId>>,
 
     //Таблица предложений о покупке
-    pub sugg_id: SuggestId,
-    pub suggests: UnorderedMap<SuggestId, SuggestsForNftToken>,
-    pub id_to_stoke_index: UnorderedMap<StockId, UnorderedSet<SuggestId>>,
-    pub buyer_acc_index: UnorderedMap<AccountId, UnorderedSet<SuggestId>>,
+    pub demand_id: DemandId,
+    pub demand: UnorderedMap<DemandId, DemandForNftToken>,
+    pub demand_token_ind: UnorderedMap<TokenId, UnorderedSet<DemandId>>,
+    pub demand_acc_ind: UnorderedMap<AccountId, UnorderedSet<DemandId>>,
+    
+    pub max_demand_bid: UnorderedMap<TokenId, Balance>
 }
 
 impl Default for Contract {
@@ -77,14 +77,16 @@ impl Contract {
     pub fn new() -> Self {
         assert!(!env::state_exists(), "Already initialized");
         Contract {
-            stock_id: 0,
-            stock: UnorderedMap::new(StorageKey::Stock.try_to_vec().unwrap()),
-            token_index: UnorderedMap::new(StorageKey::TokenIndex.try_to_vec().unwrap()),
-            acc_index: UnorderedMap::new(StorageKey::SailerIndex.try_to_vec().unwrap()),
-            sugg_id: 0,
-            suggests: UnorderedMap::new(StorageKey::Suggests.try_to_vec().unwrap()),
-            id_to_stoke_index: UnorderedMap::new(StorageKey::IdToStokeIndex.try_to_vec().unwrap()),
-            buyer_acc_index: UnorderedMap::new(StorageKey::BuyerAccIndex.try_to_vec().unwrap()),
+
+            offer: UnorderedMap::new(StorageKey::Offer.try_to_vec().unwrap()),
+            offer_acc_ind: UnorderedMap::new(StorageKey::OfferAccInd.try_to_vec().unwrap()),
+            
+            demand_id: 0,
+            demand: UnorderedMap::new(StorageKey::Demand.try_to_vec().unwrap()),
+            demand_token_ind: UnorderedMap::new(StorageKey::DemandTokenInd.try_to_vec().unwrap()),
+            demand_acc_ind: UnorderedMap::new(StorageKey::DemandAccInd.try_to_vec().unwrap()),
+
+            max_demand_bid: UnorderedMap::new(StorageKey::MaxDemandBid.try_to_vec().unwrap()),
         }
     }
 }
@@ -103,83 +105,6 @@ fn convert_to_yocto(price: u128) -> u128 {
     return price * 1_000_000_000_000_000_000_000_000
 }
 
-
-#[near_bindgen]
-impl Contract {
-   
-    pub fn set_the_price_of_the_token(&mut self, token_id: &TokenId, price: &String) {
-        
-        let seller = env::signer_account_id();
-        let n_p: u128 = price.parse().expect("set_the_price_of_the_token::Error in price setting");
-        let new_price = convert_to_yocto(n_p);
-
-        let new_announcement = Announcement {
-            token_id: token_id.clone(),
-            sailer: seller.clone(),
-            price: new_price,
-            //Флажок, что объявление о продаже
-            is_it_sale_announcement: true
-        };
-
-        //Меняем цену
-        if let Some(stock_id) = self.find_stock_id_for_sale_of(&token_id, &seller) {
-           self.stock.insert(&stock_id, &new_announcement);
-        }
-        else { //Устанавливаем впервые
-            self.stock_id = self.stock_id + 1;
-            self.stock.insert(&self.stock_id, &new_announcement);
-            self.add_stock_id_to_token_index(&token_id, &self.stock_id);
-            self.add_stock_id_to_acc_index(&seller, &self.stock_id);
-        }
-    }
-
-
-    fn find_stock_id_for_sale_of(self, token_id: &TokenId, seller: &AccountId) -> Option<StockId> {
-        if let Some(set_of_stock_id) = self.acc_index.get(&seller) {
-            for stock_id in set_of_stock_id.iter() {
-                if let Some(stock_entry) = self.stock.get(&stock_id) {
-                    assert_eq!(seller, stock_entry.sailer, "find_stock_id_for_sale_of::sailers are different");
-                    assert_eq!(token_id, stock_entry.token_id, "find_stock_id_for_sale_of::token_ids are different");
-                    if stock_entry.is_it_sale_announcement {
-                        Some(stock_id);
-                    }
-                }
-            }
-        }
-        None
-    }
-
-    fn add_stock_id_to_token_index(self, token_id: &TokenId, stock_id: &StockId) {
-        if let Some(set) = self.token_index.get(&token_id) {
-            let mut _new_set = set;
-            _new_set.insert(&self.stock_id);
-
-            self.token_index.remove(&token_id);
-            self.token_index.insert(&token_id, &_new_set);
-        } else {
-            let mut new_set_of_stock_id: UnorderedSet<SuggestId> =
-                UnorderedSet::new(self.token_index.try_to_vec().unwrap());
-            new_set_of_stock_id.insert(&self.stock_id);
-            self.token_index.insert(&token_id, &new_set_of_stock_id);
-        }
-    }
-    fn add_stock_id_to_acc_index(self, seller: &AccountId, stock_id: &StockId) {
-
-        if let Some(set) = self.acc_index.get(&seller) {
-            let mut _new_set = set;
-            _new_set.insert(&self.stock_id);
-
-            self.acc_index.remove(&seller);
-            self.acc_index.insert(&seller, &_new_set);
-        } else {
-            let mut new_set_of_stock_id: UnorderedSet<SuggestId> =
-                UnorderedSet::new(self.stock_id.try_to_vec().unwrap());
-            new_set_of_stock_id.insert(&self.stock_id);
-            self.acc_index.insert(&seller, &new_set_of_stock_id);
-        }
-    }
-
-}
 
 /*#[near_bindgen]
 impl Contract {

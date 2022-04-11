@@ -27,7 +27,93 @@ pub struct AccIndexJSON {
     pub stock_id: Vec<StockId>,
 }
 
+
 #[near_bindgen]
+impl Contract {
+   
+    pub fn set_the_price_of_the_token(&mut self, token_id: &TokenId, price: &String) {
+        
+        let seller = env::signer_account_id();
+        let n_p: u128 = price.parse().expect("set_the_price_of_the_token::Error in price setting");
+        let new_price = convert_to_yocto(n_p);
+
+        let new_announcement = Announcement {
+            token_id: token_id.clone(),
+            sailer: seller.clone(),
+            price: new_price,
+            //Флажок, что объявление о продаже
+            is_it_sale_announcement: true
+        };
+
+        //Меняем цену
+        if let Some(stock_id) = self.find_stock_id_for_sale_of(&token_id, &seller) {
+           self.stock.insert(&stock_id, &new_announcement);
+        }
+        else { //Устанавливаем впервые
+            self.stock_id = self.stock_id + 1;
+            self.stock.insert(&self.stock_id, &new_announcement);
+            self.add_stock_id_to_token_index(&token_id, &self.stock_id);
+            self.add_stock_id_to_acc_index(&seller, &self.stock_id);
+        }
+    }
+
+
+    pub fn delete_token_sale_announcement(&mut self, stock_id: &StockId) {
+        
+    }
+
+    #[private]
+    fn find_stock_id_for_sale_of(self, token_id: &TokenId, seller: &AccountId) -> Option<StockId> {
+        if let Some(set_of_stock_id) = self.acc_index.get(&seller) {
+            for stock_id in set_of_stock_id.iter() {
+                if let Some(stock_entry) = self.stock.get(&stock_id) {
+                    assert_eq!(seller, stock_entry.sailer, "find_stock_id_for_sale_of::sailers are different");
+                    assert_eq!(token_id, stock_entry.token_id, "find_stock_id_for_sale_of::token_ids are different");
+                    if stock_entry.is_it_sale_announcement {
+                        Some(stock_id);
+                    }
+                }
+            }
+        }
+        None
+    }
+    #[private]
+    fn add_stock_id_to_token_index(self, token_id: &TokenId, stock_id: &StockId) {
+        if let Some(set) = self.token_index.get(&token_id) {
+            let mut _new_set = set;
+            _new_set.insert(&self.stock_id);
+
+            self.token_index.remove(&token_id);
+            self.token_index.insert(&token_id, &_new_set);
+        } else {
+            let mut new_set_of_stock_id: UnorderedSet<SuggestId> =
+                UnorderedSet::new(self.token_index.try_to_vec().unwrap());
+            new_set_of_stock_id.insert(&self.stock_id);
+            self.token_index.insert(&token_id, &new_set_of_stock_id);
+        }
+    }
+    #[private]
+    fn add_stock_id_to_acc_index(self, seller: &AccountId, stock_id: &StockId) {
+
+        if let Some(set) = self.acc_index.get(&seller) {
+            let mut _new_set = set;
+            _new_set.insert(&self.stock_id);
+
+            self.acc_index.remove(&seller);
+            self.acc_index.insert(&seller, &_new_set);
+        } else {
+            let mut new_set_of_stock_id: UnorderedSet<SuggestId> =
+                UnorderedSet::new(self.stock_id.try_to_vec().unwrap());
+            new_set_of_stock_id.insert(&self.stock_id);
+            self.acc_index.insert(&seller, &new_set_of_stock_id);
+        }
+    }
+
+}
+
+
+
+/*#[near_bindgen]
 impl Contract {
     pub fn delete_token_sale_announcement(&mut self, stock_id: &StockId) -> bool {
         let sender_id = env::predecessor_account_id();
@@ -159,4 +245,4 @@ impl Contract {
         }
         return return_value;
     }
-}
+}*/
