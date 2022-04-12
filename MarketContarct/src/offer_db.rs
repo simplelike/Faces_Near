@@ -15,7 +15,7 @@ impl Contract {
             .expect("nft_on_approve::Error in price setting");
         let new_price = convert_to_yocto(n_p);
 
-        let sailer = env::current_account_id();
+        let sailer = env::signer_account_id();
 
         let new_sail_announcement: Announcement = Announcement {
             sailer: sailer.clone(),
@@ -46,7 +46,7 @@ impl Contract {
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64) {
-        let sailer = env::current_account_id();
+        let sailer = env::signer_account_id();
         
         if let Some(offer) = self.offer.get(&token_id) {
             assert_eq!(offer.sailer, sailer, "take_of_sale:: Only orig sailer can take off the sale");
