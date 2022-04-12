@@ -2,8 +2,10 @@ use crate::*;
 
 #[near_bindgen]
 impl Contract {
+
     //Публикация
     pub fn nft_on_approve(&mut self, token_id: &TokenId, approval_id: u64, msg: String) {
+        
         //Get price from master account
         let masterData: MasterData =
             serde_json::from_str(&msg).expect("nft_on_approve::Error in msg in nft_on_transfer");
@@ -41,6 +43,15 @@ impl Contract {
         }
         //Если нет предложений по этому токену (aka Первая публикация на продажу)
         self.public_first_offer(&token_id, &new_sail_announcement, &sailer);
+    }
+
+    pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64) {
+        let sailer = env::current_account_id();
+
+        if let Some(offer) = self.offer.get(&token_id) {
+            self.offer.remove(&token_id);
+            self.delete_from_offer_acc_ind_for(&token_id, &offer.sailer);
+        }
     }
 }
 
@@ -96,6 +107,19 @@ impl Contract {
             }
         }
         return min;
+    }
+
+    fn delete_from_offer_acc_ind_for(&mut self, token_id: &TokenId, account_id: &AccountId) {
+        if let Some(set) = self.offer_acc_ind.get(&account_id) {
+            let mut _s:UnorderedSet<TokenId> = UnorderedSet::new(b"index".try_to_vec().unwrap());
+            for t_id in set.iter() {
+                if t_id != token_id.clone() {
+                    _s.insert(&t_id);
+                }
+            }
+            self.offer_acc_ind.remove(&account_id);
+            self.offer_acc_ind.insert(&account_id, &_s);
+        }
     }
 
     #[payable]
