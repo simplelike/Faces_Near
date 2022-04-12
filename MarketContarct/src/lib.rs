@@ -48,7 +48,7 @@ pub struct DemandForNftToken {
     pub buyer_acc: AccountId,
     pub price: Balance,
 
-    pub id_to_stoke: u128,
+    pub token_id: TokenId,
 }
 
 #[near_bindgen]

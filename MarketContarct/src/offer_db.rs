@@ -47,8 +47,9 @@ impl Contract {
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64) {
         let sailer = env::current_account_id();
-
+        
         if let Some(offer) = self.offer.get(&token_id) {
+            assert_eq!(offer.sailer, sailer, "take_of_sale:: Only orig sailer can take off the sale");
             self.offer.remove(&token_id);
             self.delete_from_offer_acc_ind_for(&token_id, &offer.sailer);
         }
@@ -108,7 +109,6 @@ impl Contract {
         }
         return min;
     }
-
     fn delete_from_offer_acc_ind_for(&mut self, token_id: &TokenId, account_id: &AccountId) {
         if let Some(set) = self.offer_acc_ind.get(&account_id) {
             let mut _s:UnorderedSet<TokenId> = UnorderedSet::new(b"index".try_to_vec().unwrap());
@@ -161,8 +161,33 @@ impl Contract {
         return return_value;
     }
 }
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+#[derive(BorshDeserialize, BorshSerialize)]
+pub struct OfferAccIndJSON {
+    pub account_id: AccountId,
+    pub set: Vec<TokenId>,
+}
+#[near_bindgen]
+impl Contract {
 
+    pub fn get_list_of_offer_acc_ind(&self) -> Vec<OfferAccIndJSON>{
+        let mut return_value: Vec<OfferAccIndJSON> = Vec::new();
 
+        for k_v in self.offer_acc_ind.iter() {
+            let account_id = k_v.0;
+            let set = k_v.1.to_vec();
+
+            let json = OfferAccIndJSON {
+                account_id: account_id,
+                set: set,
+            };
+
+            return_value.push(json);
+        }
+        return return_value;
+    }
+}
 
 
 
