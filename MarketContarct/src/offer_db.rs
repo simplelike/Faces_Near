@@ -6,7 +6,7 @@ impl Contract {
     //Публикация
     pub fn nft_on_approve(&mut self, token_id: &TokenId, approval_id: u64, msg: String) {
         
-        //Get price from master account
+        //Берем цену, которую указал продавец токена
         let masterData: MasterData =
             serde_json::from_str(&msg).expect("nft_on_approve::Error in msg in nft_on_transfer");
         let n_p: u128 = masterData
@@ -16,33 +16,37 @@ impl Contract {
         let new_price = convert_to_yocto(n_p);
 
         let sailer = env::signer_account_id();
-
+        //Формируем новое предложение о продаже
         let new_sail_announcement: Announcement = Announcement {
             sailer: sailer.clone(),
             price: new_price,
 
             approval_id: approval_id,
         };
-
+        //Обновляем таблицу предложений о продаже
+        self.update_offer_db(&token_id, &new_sail_announcement, &sailer);
+        
+        //Проверяем, есть ли предложения о покупке
         if let Some(demand_set) = self.demand_token_ind.get(&token_id) {
+            //Берем максимальную цену о покупке
             let max_bid = self.max_demand_bid.get(&token_id).expect(
                 "nft_on_approve:: there is no max_bid for this tokenId. Seems like arch error",
             );
+            //Если максимальная цена больше или равна (не меньше) той, по которой сделал предложение продавец
             if max_bid >= new_price {
+                //Берем все предложения с максимальной ценой
                 let demands_set = self
                     .find_demands_set_with_bid_of(&max_bid, &token_id)
                     .expect(
                     "nft_on_approve:: there is no demand set for this bid. Seems like arch error",
                 );
+                //Берем самое раннее предложение
                 let min_demand_id = self.find_min_demand_id_in(&demand_set);
-
+                //Совершаем сделку по найденному id предложения о покупке
                 self.make_the_deal_for(&min_demand_id);
-
-                return;
             }
         }
-        //Если нет предложений по этому токену публикуем или изменяем offer
-        self.update_offer_db(&token_id, &new_sail_announcement, &sailer);
+        
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64) {
@@ -58,12 +62,7 @@ impl Contract {
 
 #[near_bindgen]
 impl Contract {
-    fn update_offer_db(
-        &mut self,
-        token_id: &TokenId,
-        announcement: &Announcement,
-        sailer: &AccountId,
-    ) {
+    fn update_offer_db( &mut self, token_id: &TokenId, announcement: &Announcement,sailer: &AccountId,) {
         self.offer.insert(&token_id, &announcement);
         self.update_offer_acc_ind(&sailer, &token_id);
     }
