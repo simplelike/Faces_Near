@@ -108,7 +108,8 @@ impl Contract {
         }
         return min;
     }
-    fn delete_from_offer_acc_ind_for(&mut self, token_id: &TokenId, account_id: &AccountId) {
+    #[private]
+    pub fn delete_from_offer_acc_ind_for(&mut self, token_id: &TokenId, account_id: &AccountId) {
         if let Some(set) = self.offer_acc_ind.get(&account_id) {
             let mut _s:UnorderedSet<TokenId> = UnorderedSet::new(b"index".try_to_vec().unwrap());
             for t_id in set.iter() {
@@ -119,11 +120,6 @@ impl Contract {
             self.offer_acc_ind.remove(&account_id);
             self.offer_acc_ind.insert(&account_id, &_s);
         }
-    }
-
-    #[payable]
-    fn make_the_deal_for(&mut self, demand_id: &DemandId) {
-
     }
 }
 

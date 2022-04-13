@@ -13,7 +13,7 @@ impl Contract {
         if let Some(offer_for_token) = self.offer.get(&token_id) {
             assert_eq!(buyer != offer_for_token.sailer, true, "make_demand_for_buying_token::Owner couldn't buy self token");
         }
-        let mut d_id: DemandId;
+        let mut d_id: Option<DemandId> = None;
         //Проверяю, есть ли уже от buyer предложение на этот токен. Если есть - меняем цену
         if let Some(demand_set) = self.demand_acc_ind.get(&buyer) {
             if let Some(demand_id) =  self.is_there_any_value_in(&demand_set, &token_id) {
@@ -24,7 +24,7 @@ impl Contract {
 
                 self.update_max_bid_for(&token_id, &price);
 
-                d_id = demand_id;
+                d_id = Some(demand_id);
             }
         }
         else { //Иначе создаем новое предложение
@@ -41,15 +41,14 @@ impl Contract {
 
             self.update_max_bid_for(&token_id, &price);
 
-            d_id = self.demand_id;
+            d_id = Some(self.demand_id);
         }
 
         //Проверяю есть ли оффер на этот токен, если да - совершаю сделку по demand_id
         if let Some(offer_for_token) = self.offer.get(&token_id) {
             //Если прикладываемая цена выше или равна цене в оффере
             if price >= offer_for_token.price {
-                //self.make_the_deal_for(&d_id);
-                return;
+                self.make_the_deal_for(&d_id.expect("make_demand_for_buying_token:: demand_id is NaN"));
             }
         }
     }
@@ -60,25 +59,27 @@ impl Contract {
             if remover != demand.buyer_acc {
                 env::panic_str("remover must be the owner of demand ");
             }
-
-            self.remove_demand_id_from_demand_token_id(
-                &self
-                    .demand
-                    .get(&demand_id)
-                    .expect("remove_demand_for_buying_token::There is no such demandId")
-                    .token_id,
-                &demand_id,
-            );
-            self.remove_demand_id_from_demand_acc_id(
-                &self
-                    .demand
-                    .get(&demand_id)
-                    .expect("remove_demand_for_buying_token::There is no such demandId")
-                    .buyer_acc,
-                &demand_id,
-            );
-
-            self.demand.remove(&demand_id);
+            
+            if self.pay_at_bet(&demand_id) {
+                self.remove_demand_id_from_demand_token_id(
+                    &self
+                        .demand
+                        .get(&demand_id)
+                        .expect("remove_demand_for_buying_token::There is no such demandId")
+                        .token_id,
+                    &demand_id,
+                );
+                self.remove_demand_id_from_demand_acc_id(
+                    &self
+                        .demand
+                        .get(&demand_id)
+                        .expect("remove_demand_for_buying_token::There is no such demandId")
+                        .buyer_acc,
+                    &demand_id,
+                );
+    
+                self.demand.remove(&demand_id);
+            }
         }
     }
 }
@@ -122,7 +123,8 @@ impl Contract {
         return None
     }
 
-    fn remove_demand_id_from_demand_token_id(&mut self, token_id: &TokenId, demand_id: &DemandId) {
+    #[private]
+    pub fn remove_demand_id_from_demand_token_id(&mut self, token_id: &TokenId, demand_id: &DemandId) {
         if let Some(set) = self.demand_token_ind.get(&token_id) {
             let mut n_s = set;
             n_s.remove(demand_id);
@@ -132,7 +134,8 @@ impl Contract {
             }
         }
     }
-    fn remove_demand_id_from_demand_acc_id(&mut self, buyer: &AccountId, demand_id: &DemandId) {
+    #[private]
+    pub fn remove_demand_id_from_demand_acc_id(&mut self, buyer: &AccountId, demand_id: &DemandId) {
         if let Some(set) = self.demand_acc_ind.get(&buyer) {
             let mut n_s = set;
             n_s.remove(demand_id);

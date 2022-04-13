@@ -22,6 +22,7 @@ pub enum StorageKey {
 }
 mod offer_db;
 mod demand_db;
+mod make_deal_mod;
 
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -89,15 +90,7 @@ impl Contract {
     }
 }
 
-#[ext_contract(ext_nft)]
-pub trait NFT {
-    fn nft_transfer(receiver_id: AccountId, token_id: String,  approval_id: u64,);
-}
 
-fn is_promise_success() -> bool {
-    assert_eq!(env::promise_results_count(),1,"Contract expected a result on the callback");
-    match env::promise_result(0) {PromiseResult::Successful(_) => true, _ => false}
-}
 
 fn convert_to_yocto(price: u128) -> u128 {
     return price * 1_000_000_000_000_000_000_000_000
