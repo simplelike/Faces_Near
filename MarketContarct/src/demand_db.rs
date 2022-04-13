@@ -6,41 +6,52 @@ impl Contract {
     pub fn make_demand_for_buying_token(&mut self, token_id: &TokenId) {
         let buyer = env::signer_account_id();
         let price = env::attached_deposit();
-        assert_eq!(price > 0, true, "make_demand_for_buying_token:: Youn need to attach deposit");
         
-        //Если есть оффер на токен
+        //Проверяем, что приложен депозит к вызову функции
+        assert_eq!(price > 0, true, "make_demand_for_buying_token:: Youn need to attach deposit");
+        //Проверка, что предлагает цену не владелец токена
         if let Some(offer_for_token) = self.offer.get(&token_id) {
-            //Проверка, что предлагает цену не владелец токена
             assert_eq!(buyer != offer_for_token.sailer, true, "make_demand_for_buying_token::Owner couldn't buy self token");
-            //И если прикладываемая цена выше или равна цене в оффере
-            if price >= offer_for_token.price {
-                //совершить сделку
-                return;
-            }
         }
-        //Иначе проверить создавал ли я уже предложение на этот токен
-        // Да - заменить        
+        let mut d_id: DemandId;
+        //Проверяю, есть ли уже от buyer предложение на этот токен. Если есть - меняем цену
         if let Some(demand_set) = self.demand_acc_ind.get(&buyer) {
             if let Some(demand_id) =  self.is_there_any_value_in(&demand_set, &token_id) {
                 let mut demand = self.demand.get(&demand_id).expect("make_demand_for_buying_token:: there is no such demandId. Arch err?");
                 demand.price = price;
                 self.demand.remove(&demand_id);
                 self.demand.insert(&demand_id, &demand);
+
+                self.update_max_bid_for(&token_id, &price);
+
+                d_id = demand_id;
             }
-            return
+        }
+        else { //Иначе создаем новое предложение
+            self.demand_id = self.demand_id + 1;
+            let new_demand: DemandForNftToken = DemandForNftToken {
+                buyer_acc: buyer.clone(),
+                price: price,
+                token_id: token_id.clone(),
+            };
+
+            self.demand.insert(&self.demand_id, &new_demand);
+            self.update_demand_token_id(&token_id, &self.demand_id.clone());
+            self.update_demand_acc_ind(&buyer, &self.demand_id.clone());
+
+            self.update_max_bid_for(&token_id, &price);
+
+            d_id = self.demand_id;
         }
 
-        //Нет - новое предложение
-        self.demand_id = self.demand_id + 1;
-        let new_demand: DemandForNftToken = DemandForNftToken {
-            buyer_acc: buyer.clone(),
-            price: price,
-            token_id: token_id.clone(),
-        };
-
-        self.demand.insert(&self.demand_id, &new_demand);
-        self.update_demand_token_id(&token_id, &self.demand_id.clone());
-        self.update_demand_acc_ind(&buyer, &self.demand_id.clone());
+        //Проверяю есть ли оффер на этот токен, если да - совершаю сделку по demand_id
+        if let Some(offer_for_token) = self.offer.get(&token_id) {
+            //Если прикладываемая цена выше или равна цене в оффере
+            if price >= offer_for_token.price {
+                //self.make_the_deal_for(&d_id);
+                return;
+            }
+        }
     }
 
     pub fn remove_demand_for_buying_token(&mut self, demand_id: &DemandId) {
@@ -129,6 +140,22 @@ impl Contract {
             if !n_s.is_empty() {
                 self.demand_acc_ind.insert(&buyer, &n_s);
             }
+        }
+    }
+
+    fn update_max_bid_for(&mut self, token_id: &TokenId, bid: &Balance) {
+        //Проверяем есть ли уже цена по предложениям на этот токен
+        if let Some(old_bid) = self.max_demand_bid.get(&token_id) {
+            //Если да - проверяем больше ли новая цена той, что была уже установлена
+            if old_bid < bid.clone() {
+                //Если да - обновляем цену
+                self.max_demand_bid.remove(&token_id);
+                self.max_demand_bid.insert(&token_id, &bid);
+            }
+        }
+        //Если это первая публикация - просто вставляем новую цену для токена
+        else {
+            self.max_demand_bid.insert(&token_id, &bid);
         }
     }
 }
