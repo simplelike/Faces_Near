@@ -41,8 +41,8 @@ impl Contract {
                 return;
             }
         }
-        //Если нет предложений по этому токену (aka Первая публикация на продажу)
-        self.public_first_offer(&token_id, &new_sail_announcement, &sailer);
+        //Если нет предложений по этому токену публикуем или изменяем offer
+        self.update_offer_db(&token_id, &new_sail_announcement, &sailer);
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64) {
@@ -58,7 +58,7 @@ impl Contract {
 
 #[near_bindgen]
 impl Contract {
-    fn public_first_offer(
+    fn update_offer_db(
         &mut self,
         token_id: &TokenId,
         announcement: &Announcement,
