@@ -22,8 +22,6 @@ impl Contract {
                 self.demand.remove(&demand_id);
                 self.demand.insert(&demand_id, &demand);
 
-                self.update_max_bid_for(&token_id, &price);
-
                 d_id = Some(demand_id);
             }
         }
@@ -39,15 +37,17 @@ impl Contract {
             self.update_demand_token_id(&token_id, &self.demand_id.clone());
             self.update_demand_acc_ind(&buyer, &self.demand_id.clone());
 
-            self.update_max_bid_for(&token_id, &price);
-
             d_id = Some(self.demand_id);
         }
 
         //Проверяю есть ли оффер на этот токен, если да - совершаю сделку по demand_id
         if let Some(offer_for_token) = self.offer.get(&token_id) {
+            env::log_str("Offer exist");
+            env::log_str(price.to_string().as_str());
+            env::log_str(offer_for_token.price.to_string().as_str());
             //Если прикладываемая цена выше или равна цене в оффере
             if price >= offer_for_token.price {
+                env::log_str("Starting transfer");
                 self.make_the_deal_for(&d_id.expect("make_demand_for_buying_token:: demand_id is NaN"));
             }
         }
@@ -143,22 +143,6 @@ impl Contract {
             if !n_s.is_empty() {
                 self.demand_acc_ind.insert(&buyer, &n_s);
             }
-        }
-    }
-
-    fn update_max_bid_for(&mut self, token_id: &TokenId, bid: &Balance) {
-        //Проверяем есть ли уже цена по предложениям на этот токен
-        if let Some(old_bid) = self.max_demand_bid.get(&token_id) {
-            //Если да - проверяем больше ли новая цена той, что была уже установлена
-            if old_bid < bid.clone() {
-                //Если да - обновляем цену
-                self.max_demand_bid.remove(&token_id);
-                self.max_demand_bid.insert(&token_id, &bid);
-            }
-        }
-        //Если это первая публикация - просто вставляем новую цену для токена
-        else {
-            self.max_demand_bid.insert(&token_id, &bid);
         }
     }
 }

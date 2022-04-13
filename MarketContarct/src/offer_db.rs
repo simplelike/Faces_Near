@@ -2,14 +2,12 @@ use crate::*;
 
 #[near_bindgen]
 impl Contract {
-
     //Публикация
     pub fn nft_on_approve(&mut self, token_id: &TokenId, approval_id: u64, msg: String) {
-        
         //Берем цену, которую указал продавец токена
-        let masterData: MasterData =
+        let master_data: MasterData =
             serde_json::from_str(&msg).expect("nft_on_approve::Error in msg in nft_on_transfer");
-        let n_p: u128 = masterData
+        let n_p: u128 = master_data
             .price
             .parse()
             .expect("nft_on_approve::Error in price setting");
@@ -25,11 +23,10 @@ impl Contract {
         };
         //Обновляем таблицу предложений о продаже
         self.update_offer_db(&token_id, &new_sail_announcement, &sailer);
-        
         //Проверяем, есть ли предложения о покупке
-        if let Some(demand_set) = self.demand_token_ind.get(&token_id) {
+        if let Some(_) = self.demand_token_ind.get(&token_id) {
             //Берем максимальную цену о покупке
-            let max_bid = self.max_demand_bid.get(&token_id).expect(
+            let max_bid = self.find_max_bid_for_token_id(&token_id).expect(
                 "nft_on_approve:: there is no max_bid for this tokenId. Seems like arch error",
             );
             //Если максимальная цена больше или равна (не меньше) той, по которой сделал предложение продавец
@@ -40,20 +37,32 @@ impl Contract {
                     .expect(
                     "nft_on_approve:: there is no demand set for this bid. Seems like arch error",
                 );
-                //Берем самое раннее предложение
-                let min_demand_id = self.find_min_demand_id_in(&demand_set);
-                //Совершаем сделку по найденному id предложения о покупке
-                self.make_the_deal_for(&min_demand_id);
+                //env::log_str(demands_set.to_vec()[0].to_string().as_str());
+                if !demands_set.is_empty() {
+                    //Берем самое раннее предложение
+                    let min_demand_id = self.find_min_demand_id_in(&demands_set);
+                    //Совершаем сделку по найденному id предложения о покупке
+                    self.make_the_deal_for(&min_demand_id);
+                }
+                else {
+                    env::log_str("set is empty?");
+                    env::log_str(max_bid.to_string().as_str());
+                }
             }
         }
-        
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64) {
         let sailer = env::signer_account_id();
-        
         if let Some(offer) = self.offer.get(&token_id) {
-            assert_eq!(offer.sailer, sailer, "take_of_sale:: Only orig sailer can take off the sale");
+            assert_eq!(
+                offer.sailer, sailer,
+                "take_of_sale:: Only orig sailer can take off the sale"
+            );
+            assert_eq!(
+                offer.approval_id, approval_id,
+                "take_of_sale:: Approval ids must be equal"
+            );
             self.offer.remove(&token_id);
             self.delete_from_offer_acc_ind_for(&token_id, &offer.sailer);
         }
@@ -62,7 +71,12 @@ impl Contract {
 
 #[near_bindgen]
 impl Contract {
-    fn update_offer_db( &mut self, token_id: &TokenId, announcement: &Announcement,sailer: &AccountId,) {
+    fn update_offer_db(
+        &mut self,
+        token_id: &TokenId,
+        announcement: &Announcement,
+        sailer: &AccountId,
+    ) {
         self.offer.insert(&token_id, &announcement);
         self.update_offer_acc_ind(&sailer, &token_id);
     }
@@ -79,9 +93,15 @@ impl Contract {
             self.offer_acc_ind.insert(&account_id, &n_s);
         }
     }
-    fn find_demands_set_with_bid_of(&self, bid: &Balance, token_id: &TokenId,) -> Option<UnorderedSet<DemandId>> {
+    fn find_demands_set_with_bid_of(
+        &self,
+        bid: &Balance,
+        token_id: &TokenId,
+    ) -> Option<UnorderedSet<DemandId>> {
         if let Some(set) = self.demand_token_ind.get(&token_id) {
-            let mut r_s: UnorderedSet<DemandId> = UnorderedSet::new(token_id.try_to_vec().unwrap());
+            let id:String = bid.to_string() + token_id;
+            let mut r_s: UnorderedSet<DemandId> = UnorderedSet::new(id.try_to_vec().unwrap());
+            env::log_str(r_s.len().to_string().as_str());
             for demand_id in set.iter() {
                 if self
                     .demand
@@ -89,11 +109,16 @@ impl Contract {
                     .expect(
                         "find_demands_set_with_bid_of::there is no such demand for this demanid",
                     )
-                    .price == bid.clone()
+                    .price
+                    == bid.clone()
                 {
-                    r_s.insert(&demand_id);
+                    env::log_str("they are equal");
+                    env::log_str(demand_id.to_string().as_str());
+                    let b = r_s.insert(&demand_id.clone());
+                    env::log_str(r_s.len().to_string().as_str());
                 }
             }
+            env::log_str(r_s.len().to_string().as_str());
             return Some(r_s);
         }
 
@@ -111,7 +136,7 @@ impl Contract {
     #[private]
     pub fn delete_from_offer_acc_ind_for(&mut self, token_id: &TokenId, account_id: &AccountId) {
         if let Some(set) = self.offer_acc_ind.get(&account_id) {
-            let mut _s:UnorderedSet<TokenId> = UnorderedSet::new(b"index".try_to_vec().unwrap());
+            let mut _s: UnorderedSet<TokenId> = UnorderedSet::new(b"index".try_to_vec().unwrap());
             for t_id in set.iter() {
                 if t_id != token_id.clone() {
                     _s.insert(&t_id);
@@ -121,8 +146,24 @@ impl Contract {
             self.offer_acc_ind.insert(&account_id, &_s);
         }
     }
-}
 
+    fn find_max_bid_for_token_id(&self, token_id: &TokenId) -> Option<Balance> {
+        let mut max_bid = 0;
+        if let Some(set_of_demand_id) = self.demand_token_ind.get(&token_id) {
+            for demand_id in set_of_demand_id.iter() {
+                let demand = self
+                    .demand
+                    .get(&demand_id)
+                    .expect("find_max_bid_for_token_id::no demand?");
+                if demand.price > max_bid {
+                    max_bid = demand.price;
+                }
+            }
+            return Some(max_bid);
+        }
+        return None;
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -136,8 +177,7 @@ pub struct OfferJSON {
 
 #[near_bindgen]
 impl Contract {
-
-    pub fn get_list_of_offers(&self) -> Vec<OfferJSON>{
+    pub fn get_list_of_offers(&self) -> Vec<OfferJSON> {
         let mut return_value: Vec<OfferJSON> = Vec::new();
 
         for k_v in self.offer.iter() {
@@ -165,8 +205,7 @@ pub struct OfferAccIndJSON {
 }
 #[near_bindgen]
 impl Contract {
-
-    pub fn get_list_of_offer_acc_ind(&self) -> Vec<OfferAccIndJSON>{
+    pub fn get_list_of_offer_acc_ind(&self) -> Vec<OfferAccIndJSON> {
         let mut return_value: Vec<OfferAccIndJSON> = Vec::new();
 
         for k_v in self.offer_acc_ind.iter() {
@@ -184,13 +223,11 @@ impl Contract {
     }
 }
 
-
-
 #[cfg(all(test, not(target_arch = "wasm32")))]
 mod tests {
     use super::*;
-    use near_sdk::MockedBlockchain;
     use near_sdk::EpochHeight;
+    use near_sdk::MockedBlockchain;
     use near_sdk::{testing_env, VMContext};
     use std::collections::HashMap;
     use std::iter::FromIterator;
@@ -224,19 +261,17 @@ mod tests {
         }
     }
 
-
     #[test]
     fn it_finds_min() {
-        let mut researched_set:UnorderedSet<DemandId> = UnorderedSet::new(b"a".try_to_vec().unwrap());
+        let mut researched_set: UnorderedSet<DemandId> =
+            UnorderedSet::new(b"a".try_to_vec().unwrap());
         for i in 1..600 {
             let u_i = i as u128;
             researched_set.insert(&u_i);
         }
-        
         let context = get_context("fg10.testnet".parse().unwrap());
         let mut contract = Contract::new();
 
         assert_eq!(1, contract.find_min_demand_id_in(&researched_set));
-
     }
 }

@@ -1,9 +1,10 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{UnorderedMap, UnorderedSet};
 use near_sdk::json_types::U128;
+
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, Promise, ext_contract, near_bindgen, AccountId, Balance, Gas, PromiseResult};
-//use std::collections::HashSet;
+use std::collections::HashSet;
 
 pub type TokenId = String;
 pub type DemandId = u128;
@@ -61,8 +62,6 @@ pub struct Contract {
     pub demand: UnorderedMap<DemandId, DemandForNftToken>,
     pub demand_token_ind: UnorderedMap<TokenId, UnorderedSet<DemandId>>,
     pub demand_acc_ind: UnorderedMap<AccountId, UnorderedSet<DemandId>>,
-    
-    pub max_demand_bid: UnorderedMap<TokenId, Balance>
 }
 
 impl Default for Contract {
@@ -84,8 +83,6 @@ impl Contract {
             demand: UnorderedMap::new(StorageKey::Demand.try_to_vec().unwrap()),
             demand_token_ind: UnorderedMap::new(StorageKey::DemandTokenInd.try_to_vec().unwrap()),
             demand_acc_ind: UnorderedMap::new(StorageKey::DemandAccInd.try_to_vec().unwrap()),
-
-            max_demand_bid: UnorderedMap::new(StorageKey::MaxDemandBid.try_to_vec().unwrap()),
         }
     }
 }
