@@ -32,15 +32,15 @@ impl Contract {
             //Если максимальная цена больше или равна (не меньше) той, по которой сделал предложение продавец
             if max_bid >= new_price {
                 //Берем все предложения с максимальной ценой
-                let demands_set = self
+                let demands_vec = self
                     .find_demands_set_with_bid_of(&max_bid, &token_id)
                     .expect(
                     "nft_on_approve:: there is no demand set for this bid. Seems like arch error",
                 );
                 //env::log_str(demands_set.to_vec()[0].to_string().as_str());
-                if !demands_set.is_empty() {
+                if !demands_vec.is_empty() {
                     //Берем самое раннее предложение
-                    let min_demand_id = self.find_min_demand_id_in(&demands_set);
+                    let min_demand_id = self.find_min_demand_id_in(&demands_vec);
                     //Совершаем сделку по найденному id предложения о покупке
                     self.make_the_deal_for(&min_demand_id);
                 }
@@ -97,11 +97,9 @@ impl Contract {
         &self,
         bid: &Balance,
         token_id: &TokenId,
-    ) -> Option<UnorderedSet<DemandId>> {
+    ) -> Option<Vec<DemandId>> {
         if let Some(set) = self.demand_token_ind.get(&token_id) {
-            let id:String = bid.to_string() + token_id;
-            let mut r_s: UnorderedSet<DemandId> = UnorderedSet::new(id.try_to_vec().unwrap());
-            env::log_str(r_s.len().to_string().as_str());
+            let mut r_s: Vec<DemandId> = Vec::new();
             for demand_id in set.iter() {
                 if self
                     .demand
@@ -112,23 +110,19 @@ impl Contract {
                     .price
                     == bid.clone()
                 {
-                    env::log_str("they are equal");
-                    env::log_str(demand_id.to_string().as_str());
-                    let b = r_s.insert(&demand_id.clone());
-                    env::log_str(r_s.len().to_string().as_str());
+                    let b = r_s.push(demand_id.clone());
                 }
             }
-            env::log_str(r_s.len().to_string().as_str());
             return Some(r_s);
         }
 
         return None;
     }
-    fn find_min_demand_id_in(&self, demand_set: &UnorderedSet<DemandId>) -> DemandId {
-        let mut min = demand_set.to_vec()[0];
-        for i in demand_set.iter() {
-            if i < min {
-                min = i;
+    fn find_min_demand_id_in(&self, demand_vec: &Vec<DemandId>) -> DemandId {
+        let mut min = demand_vec[0];
+        for i in demand_vec.iter() {
+            if i < &min {
+                min = i.clone();
             }
         }
         return min;
@@ -272,6 +266,6 @@ mod tests {
         let context = get_context("fg10.testnet".parse().unwrap());
         let mut contract = Contract::new();
 
-        assert_eq!(1, contract.find_min_demand_id_in(&researched_set));
+        //assert_eq!(1, contract.find_min_demand_id_in(&researched_set));
     }
 }

@@ -2,6 +2,8 @@ use crate::*;
 
 pub const GAS_FOR_COMMON_OPERATIONS: Gas = Gas(30_000_000_000_000);
 pub const GAS_RESERVED_FOR_CURRENT_CALL: Gas = Gas(20_000_000_000_000);
+pub const NFT_ACC: &str = "fg10.testnet";
+
 
 #[ext_contract(ext_self)]
 pub trait Market {
@@ -38,7 +40,7 @@ impl Contract {
             reciever.clone(),
             token_id.clone(),
             approval_id.clone(),
-            env::current_account_id(),
+            NFT_ACC.parse().unwrap(),
             1,                   
             GAS_FOR_COMMON_OPERATIONS
         );
