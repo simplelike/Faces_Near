@@ -34,17 +34,18 @@
 <script>
     async function contractMethodEval() {
 
-        /*let promises = []
+        let promises = []
 
         let i = 0
         let args_arr = []
-        for (let [index, element] of localDump.entries()) {
+        //console.log(localDump_test)
+        for (let [index, element] of localDump_test.entries()) {
 
             let _e = {
                 "token_id": index.toString(),
                 "metadata": {
                     "title": element["T"],
-                    "media": "ipfs://" + element["g_h"]
+                    "media": element["g_h"]
                 },
                 "receiver_id": contract_id
             }
@@ -52,14 +53,9 @@
             if (i <= 5) {
                 args_arr.push(_e)
             }
-            if (i === 5 || i === localDump.length - 1) {
+            if (i === 5 || index === localDump_test.length - 1) {
                 let args_str = JSON.stringify(args_arr)
                 console.log(args_str)
-                // let promise = new Promise ( (resolve, reject) => {
-                //     contract.nft_batch_mint({
-                //         innerdData: args_str
-                //     })
-                // })
 
                 promises.push((resolve, reject) => {
                     contract.nft_batch_mint(
@@ -74,21 +70,16 @@
             }
             i++
         }
-        // localDump.forEach((element, index) => {
 
-           
-        // })
-
-        let _pr = promises.slice(5)
-        console.log(_pr)
-        await Promise.all(_pr.map(
+        //let _pr = promises.slice(5)
+        await Promise.all(promises.map(
             promiseFn => new Promise(promiseFn)
         )).
         then(value => {
-            console.log("value")
+            console.log(value)
         }, reason => {
             console.log(reason)
         });
-*/
+
     }
 </script>

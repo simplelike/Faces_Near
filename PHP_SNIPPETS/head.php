@@ -13,6 +13,7 @@
     <!-- Near Api-->
     <script src="/js/nearApi.min.js"></script>
     <script src="/js/localDump.js"></script>
+    <script src="/js/localDump_test.js"></script>
     <script src="/js/near_api.js"></script>
     <script src="/js/localForage.min.js"></script>
     <script src="/js/localForageSync.js"></script>

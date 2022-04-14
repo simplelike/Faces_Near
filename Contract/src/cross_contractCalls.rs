@@ -10,7 +10,7 @@ trait Market_Interface {
     fn accept_suggest_for_buying_token( &mut self, sug_id: u128, account_id: AccountId);
 
     fn make_demand_for_buying_token (&mut self, token_id: TokenId);
-    fn remove_demand_for_buying_token (&self, demand_id: u128);
+    fn remove_demand_for_buying_token (&mut self, demand_id: u128);
 }
 
 
