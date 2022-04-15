@@ -12,13 +12,11 @@
 
 ?>
 
-<script src="/js/Page_Scripts/myCollectionScript.js"></script>
-
 <div class="container marginContent">
     <div class="row marginContent">
         <div class="col-4 centerContent">
             <div class = "bigTitle">Количество супремов:</div>
-            <div class="littleTitle" id="supremCount">5</div>
+            <div class="littleTitle" id="supremCount"></div>
         </div>
         <div class="col-4 centerContent">
             <div class = "bigTitle">Активность:</div>
@@ -61,14 +59,18 @@
 <div class="container marginContent" style=" margin-top: 60px; ">
     <div class="row borderBottom">
         <div class="col-9">
-            <h3>Мои Супремы: 5</h3>
+            <h3>Все мои Супремы: <span id ="countOfSupremesSpan"></span></h3>
         </div>
         <div class="col-3">
             <span class="littleTitle">500 <img style='width: 35px;' src='/sources/nearCircleLogo.png'> <span class="greenColor littleTitle">($3000)</span></span>
         </div>
     </div>
-    <div class="row marginContent">
-        <div class="col-1">
+    <div>
+        <div id = "personalSupremes" class="row marginContent"></div>
+        <div>
+            <a href = "#" id = "mySupremesTab_showmore">Загрузить еще</a>
+        </div>
+        <!--div class="col-1">
             <img src="/previewData/smallPreview/1.png">
             <div class="centerContent" style=" padding-top: 10px; ">
                 <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
@@ -103,7 +105,57 @@
             <div class="greenColor centerContent">
                 ($600)
             </div>
+        </div-->
+    </div>
+    <div class="row borderBottom">
+        <div class="col-9">
+            <h3>Мои Супремы на продаже: <span id ="numberOfMySupremsForSale"></span></h3>
         </div>
+        <div class="col-3">
+            <span class="littleTitle">500 <img style='width: 35px;' src='/sources/nearCircleLogo.png'> <span class="greenColor littleTitle">($3000)</span></span>
+        </div>
+    </div>
+    <div>
+        <div id = "personalSupremesOnSale" class="row marginContent"></div>
+        <div>
+            <a href = "#" id = "personalSupremesOnSaleTab_showmore">Загрузить еще</a>
+        </div>
+        <!--div class="col-1">
+            <img src="/previewData/smallPreview/1.png">
+            <div class="centerContent" style=" padding-top: 10px; ">
+                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
+            </div>
+            <div class="greenColor centerContent">
+                ($600)
+            </div>
+        </div>
+        <div class="col-1">
+            <img src="/previewData/smallPreview/2.png">
+            <div class="centerContent" style=" padding-top: 10px; ">
+                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
+            </div>
+            <div class="greenColor centerContent">
+                ($600)
+            </div>
+        </div>
+        <div class="col-1">
+            <img src="/previewData/smallPreview/3.png">
+            <div class="centerContent" style=" padding-top: 10px; ">
+                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
+            </div>
+            <div class="greenColor centerContent">
+                ($600)
+            </div>
+        </div>
+        <div class="col-1">
+            <img src="/previewData/smallPreview/4.png">
+            <div class="centerContent" style=" padding-top: 10px; ">
+                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
+            </div>
+            <div class="greenColor centerContent">
+                ($600)
+            </div>
+        </div-->
     </div>
     <div class="row borderBottom marginContent">
         <div class="col-9">
