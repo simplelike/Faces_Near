@@ -43,8 +43,7 @@ impl Contract {
                     let min_demand_id = self.find_min_demand_id_in(&demands_vec);
                     //Совершаем сделку по найденному id предложения о покупке
                     self.make_the_deal_for(&min_demand_id);
-                }
-                else {
+                } else {
                     env::log_str("set is empty?");
                     env::log_str(max_bid.to_string().as_str());
                 }
@@ -216,6 +215,88 @@ impl Contract {
         return return_value;
     }
 }
+
+#[near_bindgen]
+impl Contract {
+    pub fn get_list_of_offers_for_acc(
+        &self,
+        account_id: &AccountId,
+        start_index: Option<u64>,
+        limit: Option<u64>,
+    ) -> Vec<(TokenId, Balance)> {
+        if let Some(offers_set) = self.offer_acc_ind.get(&account_id) {
+            //let mut r_v = Vec::new();
+            let start = start_index.unwrap_or(0);
+            let pairs: Vec<(TokenId, Balance)> = offers_set.iter()
+                //skip to the index we specified in the start variable
+                .skip(start as usize)
+                //take the first "limit" elements in the vector. If we didn't specify a limit, use 50
+                .take(limit.unwrap_or(50) as usize)
+                //we'll map the token IDs which are strings into Json Tokens
+                .map(|token_id| {
+                    (token_id.clone(), self.offer.get(&token_id).expect("get_list_of_offers_for_acc::no such offer").price)
+                }).collect();
+
+            return pairs;
+                //since we turned the keys into an iterator, we need to turn it back into a vector to return
+        } else {
+            return vec![];
+        }
+    }
+}
+
+#[near_bindgen]
+impl Contract {
+    pub fn get_count_of_offers_for_acc(
+        &self,
+        account_id: &AccountId,
+    ) -> u128 {
+        if let Some(offers_set) = self.offer_acc_ind.get(&account_id) {
+            return offers_set.to_vec().len() as u128;
+        } else {
+            return 0;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #[cfg(all(test, not(target_arch = "wasm32")))]
 mod tests {

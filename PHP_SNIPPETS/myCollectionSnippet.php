@@ -70,42 +70,6 @@
         <div>
             <a href = "#" id = "mySupremesTab_showmore">Загрузить еще</a>
         </div>
-        <!--div class="col-1">
-            <img src="/previewData/smallPreview/1.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/2.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/3.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/4.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div-->
     </div>
     <div class="row borderBottom">
         <div class="col-9">
@@ -120,44 +84,8 @@
         <div>
             <a href = "#" id = "personalSupremesOnSaleTab_showmore">Загрузить еще</a>
         </div>
-        <!--div class="col-1">
-            <img src="/previewData/smallPreview/1.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/2.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/3.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/4.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>100</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($600)
-            </div>
-        </div-->
     </div>
-    <div class="row borderBottom marginContent">
+    <!--div class="row borderBottom marginContent">
         <div class="col-9">
             <h3>Предложения на моих Супремов: 2</h3>
         </div>
@@ -184,81 +112,22 @@
                 ($1523)
             </div>
         </div>
-    </div>
+    </div-->
     <div class="row borderBottom marginContent">
         <div class="col-9">
-            <h3>Мои предложения: 7</h3>
+            <h3>Мои предложения: <span id ="numberOfMyDemands"></span></h3>
         </div>
         <div class="col-3">
             <span class="littleTitle">325 <img style='width: 35px;' src='/sources/nearCircleLogo.png'> <span class="greenColor littleTitle">($2423)</span></span>
         </div>
     </div>
-    <div class="row marginContent">
-        <div class="col-1">
-            <img src="/previewData/smallPreview/1.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/2.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/3.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/4.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/5.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/6.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
-        </div>
-        <div class="col-1">
-            <img src="/previewData/smallPreview/7.png">
-            <div class="centerContent" style=" padding-top: 10px; ">
-                <b>50</b> <img style='width: 20px;' src='/sources/nearCircleLogo.png'>
-            </div>
-            <div class="greenColor centerContent">
-                ($400)
-            </div>
+    <div>
+        <div id = "myDemands" class="row marginContent"></div>
+        <div>
+            <a href = "#" id = "myDemands_showMore">Загрузить еще</a>
         </div>
     </div>
-    <div class="row borderBottom marginContent">
+    <!--div class="row borderBottom marginContent">
         <div class="col-9">
             <h3>Купленные Супремы: 1</h3>
         </div>
@@ -295,5 +164,5 @@
                 ($2423)
             </div>
         </div>
-    </div>
+    </div-->
 </div>
