@@ -1,7 +1,4 @@
-const market_contract = "market.fg6.testnet"
 const near_logo = "<img style='width: 20px;' src='/sources/nearCircleLogo.png'>"
-const logged_user = wallet.getAccountId()
-
 
 //MySupremesTab
 let allSupremesTab_currentStartIndex = 0

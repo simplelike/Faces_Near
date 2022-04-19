@@ -1,4 +1,8 @@
 const contract_id = 'fg10.testnet'
+
+const market_contract = "market.fg6.testnet"
+
+
 // connect to NEAR
 const near = new nearApi.Near({
     keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore(),
@@ -15,6 +19,8 @@ const contract = new nearApi.Contract(wallet.account(), contract_id, {
                   'nft_metadata',
                   'nft_tokens_for_owner',
                   'nft_supply_for_owner',
+                  'nft_get_owner_for_token',
+                  'get_offer_for_token_id',
                   'get_link_to_data',
                   'get_hash_of_data'],
 
@@ -67,3 +73,5 @@ async function getState() {
   const res = JSON.parse(Buffer.from(rawResult.result).toString());
   console.log(res);
 }
+
+const logged_user = wallet.getAccountId()

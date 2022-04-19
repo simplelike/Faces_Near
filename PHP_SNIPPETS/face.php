@@ -1,3 +1,5 @@
+<script src="/js/Page_Scripts/faceScript.js"></script>
+
 <div class="preloader">
     <div class="preloader__image"></div>
 </div>
@@ -16,6 +18,11 @@
     </div>
     <div class="row">
         <div class="col align-self-center centerContent faceInfo" id="totalpriceDiv"></div>
+    </div>
+    <div class="row">
+        <div class="col align-self-center centerContent faceInfo no-vis" id="makeDemandInput">
+            <input id = "make_demand_input" type = "number">
+        </div>
     </div>
     <div class="row">
         <div class="col align-self-center centerContent faceInfo" id="currentOwner"></div>
@@ -146,92 +153,9 @@
     .noneBorderTop {
         border-top: none!important;
     }
+
+    .no-vis {
+        display: none;
+    }
+
 </style>
-
-<script type="text/javascript">
-
-
-    let data
-    var queryDict = {}
-    location.search.substr(1).split("&").forEach(function(item) {
-        queryDict[item.split("=")[0]] = item.split("=")[1]
-    })
-    let id = queryDict.id
-    let number = parseInt(id) + 1 
-    localForageHandler(_start)
-
-    function _start(v) {
-            data = v[id]
-            setImageToDiv("/previewData/maxPreview/"+number+".png", data.g_h)
-            setUrlPath(data.g_h)
-            setNumber(data.nbr)
-            setRarity(data.rrt)
-            setCurrentOwner("x.near")
-            setFirstOwner("ivtanart.near")
-            setTotalPrice("598")
-
-
-
-            setContentForAttrComponent("jeweleryAttrComponent", "Украшение", data.j_a.t_c, data.j_a.T)
-            setContentForAttrComponent("backgroundAttrComponent", "Фон", data.b_a.t_c, data.b_a.T)
-            setContentForAttrComponent("maskAttrComponent", "Маска", data.m_a.t_c, data.m_a.T)
-            setContentForAttrComponent("hatAttrComponent", "Шапка", data.h_a.t_c, data.h_a.T)
-            setContentForAttrComponent("shirtAttrComponent", "Футболка", data.s_a.t_c, data.s_a.T)
-            setContentForAttrComponent("lipsAttrComponent", "Губы", data.l_a.t_c, data.l_a.T)
-            setContentForAttrComponent("eyesAttrComponent", "Глаза", data.e_a.t_c, data.e_a.T)
-            setContentForAttrComponent("faceAttrComponent", "Лицо", data.f_a.t_c, data.f_a.T)
-
-            $('.preloader').fadeOut().end().delay(400).fadeOut('slow')
-    }
-
-    function setContentForAttrComponent(id, title, count, choosenElementTitle) {
-        let element = $('#' + id)
-        //let titleForInput = value[0].replace(".png", "")
-        element.append(
-            `<div class = "row" class = "padding">
-                    <div class = "col typeStyle">
-                        ${title.replace(".png", "")}
-                    </div>
-                    <div class = "col componentTitle">
-                       ${count.replace(".png", "")} Супремов
-                    </div>
-            </div>
-            <div class="row">
-                <div class="col totalCountStr">
-                    ${choosenElementTitle.replace(".png", "")}
-                </div>
-            </div>`
-        )
-    }
-    const button = '<a href="#" class = "buyButton button" onClick = alert("here")> КУПИТЬ </a>'
-
-    function setNumber(number) {
-        $('#numberDiv').append("№ " + number.toString());
-    }
-
-    function setRarity(rarity) {
-        $('#rarityDiv').append("Редкость - <span class = 'greenColor'>" + rarity + "</span>");
-    }
-
-    function setCurrentOwner(currentOwner) {
-        $('#currentOwner').append("Текущий владелец: <span class = 'greenColor'>" + currentOwner + "</span>");
-    }
-
-    function setFirstOwner(firstOwner) {
-        $('#firstOwner').append("Первый владелец: <span class = 'redColor'>" + firstOwner + "</span>");
-    }
-
-    function setTotalPrice(totalPrice) {
-        $('#totalpriceDiv').append("<span class = 'greenColor'>" + totalPrice + "</span> <img style='width: 50px;' src= '/sources/nearCircleLogo.png'>" + button);
-    }
-
-    function setImageToDiv(src, hash) {
-        let ipfUrl = hash;
-        $('#imgDiv').append(`<a href = "${ipfUrl}"><img src = "${src}"></a>`)
-    }
-
-    function setUrlPath(hash) {
-        let ipfUrl = "https://ipfs.io/ipfs/" + hash;
-        $('#linkDiv').append(`<a href = "${ipfUrl}">Ссылка на оригинал</a>`)
-    }
-</script>

@@ -126,3 +126,33 @@ function find_max_bid_in(arr) {
     }
     return max_bid
 }
+
+
+
+////Face Page functions
+
+async function getOwnerOfToken(token_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.nft_get_owner_for_token({
+            token_id: token_id,
+        })
+        resolve(_result)
+        reject("error")
+    })
+}
+
+async function getOfferForTokenId(token_id) {
+    const rawResult = await provider.query({
+        request_type: "call_function",
+        account_id: market_contract,
+        method_name: "get_offer_for_token_id",
+        args_base64: Buffer.from(JSON.stringify({
+            token_id: token_id,
+        })).toString('base64'),
+        finality: "optimistic",
+    });
+
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
+    console.log(res)
+    return res
+}

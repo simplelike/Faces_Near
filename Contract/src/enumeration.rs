@@ -72,4 +72,21 @@ pub fn nft_supply_for_owner(
             //since we turned the keys into an iterator, we need to turn it back into a vector to return
             .collect()
     }
+
+
+
+
+
+    pub fn nft_get_owner_for_token(
+        &self,
+        token_id: &TokenId,
+    ) -> Option<AccountId> {
+        
+        if let Some(token) = self.tokens_by_id.get(&token_id) {
+            return Some(token.owner_id)
+        }
+        return None
+    }
 }
+
+

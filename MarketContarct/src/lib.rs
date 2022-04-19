@@ -22,6 +22,7 @@ pub enum StorageKey {
     MaxDemandBid
 }
 mod offer_db;
+mod offer_db_view_methods;
 mod demand_db;
 mod make_deal_mod;
 

@@ -11,6 +11,7 @@
 // echo json_encode($result,JSON_UNESCAPED_UNICODE);
 
 ?>
+<script src="/js/Page_Scripts/myCollectionScript.js"></script>
 
 <div class="container marginContent">
     <div class="row marginContent">
