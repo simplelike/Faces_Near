@@ -56,33 +56,41 @@
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
 <div class="container marginContent" style=" margin-top: 60px; ">
     <div class="row borderBottom">
         <div class="col-9">
-            <h3>Все мои Супремы: <span id ="countOfSupremesSpan"></span></h3>
+            <h3>Все мои Супремы: <span id ="allSupremes_count"></span></h3>
         </div>
         <div class="col-3">
             <span class="littleTitle">500 <img style='width: 35px;' src='/sources/nearCircleLogo.png'> <span class="greenColor littleTitle">($3000)</span></span>
         </div>
     </div>
     <div>
-        <div id = "personalSupremes" class="row marginContent"></div>
+        <div id = "allSupremes_content" class="row marginContent"></div>
         <div>
-            <a href = "#" id = "mySupremesTab_showmore">Загрузить еще</a>
+            <a href = "#" id = "allSupremes_showMore">Загрузить еще</a>
         </div>
     </div>
     <div class="row borderBottom">
         <div class="col-9">
-            <h3>Мои Супремы на продаже: <span id ="numberOfMySupremsForSale"></span></h3>
+            <h3>Мои Супремы на продаже: <span id ="offersTab_count"></span></h3>
         </div>
         <div class="col-3">
             <span class="littleTitle">500 <img style='width: 35px;' src='/sources/nearCircleLogo.png'> <span class="greenColor littleTitle">($3000)</span></span>
         </div>
     </div>
     <div>
-        <div id = "personalSupremesOnSale" class="row marginContent"></div>
+        <div id = "offersTab_content" class="row marginContent"></div>
         <div>
-            <a href = "#" id = "personalSupremesOnSaleTab_showmore">Загрузить еще</a>
+            <a href = "#" id = "offersTab_showmore">Загрузить еще</a>
         </div>
     </div>
     <!--div class="row borderBottom marginContent">
@@ -115,14 +123,14 @@
     </div-->
     <div class="row borderBottom marginContent">
         <div class="col-9">
-            <h3>Мои предложения: <span id ="numberOfMyDemands"></span></h3>
+            <h3>Мои предложения: <span id ="myDemands_count"></span></h3>
         </div>
         <div class="col-3">
             <span class="littleTitle">325 <img style='width: 35px;' src='/sources/nearCircleLogo.png'> <span class="greenColor littleTitle">($2423)</span></span>
         </div>
     </div>
     <div>
-        <div id = "myDemands" class="row marginContent"></div>
+        <div id = "myDemands_content" class="row marginContent"></div>
         <div>
             <a href = "#" id = "myDemands_showMore">Загрузить еще</a>
         </div>

@@ -1,196 +1,131 @@
 const market_contract = "market.fg6.testnet"
 const near_logo = "<img style='width: 20px;' src='/sources/nearCircleLogo.png'>"
+const logged_user = wallet.getAccountId()
 
-let localForageData
+
 //MySupremesTab
-let mySupremesTab_currentStartIndex = 0
-let mySupremesTab_limit = 10
+let allSupremesTab_currentStartIndex = 0
+let allSupremesTab_limit = 10
 let countOfSupremes
 
-//MySupremesOnSalesTab
-let mySupremesOnSaleTab_currentStartIndex = 0
-let mySupremesOnSaleTab_limit = 10
+//Offers
+let myOffersTab_currentStartIndex = 0
+let myOffersTab_limit = 10
 let countOfMySupremesOnSaleTab
 
+//Demands
+let myDeamndsTab_currentStartIndex = 0
+let myDeamndsTab_limit = 10
+let countOfMyDemandsTab
+
 $(window).load(function () {
-    //Получаем локальный дамп данных и после получения его вызываем все остальные функции заполнения контента
-    localForageHandler(fillContent)
+    fillContent()
 })
 
 
-function fillContent(v) {
-    localForageData = v
+function fillContent() {
 
-    showCountOfMySupremes()
-    showListOfMySupremes()
-
-    showCountOfMySupremesOnSale()
-    showListOfMySupremesOnSale()
-
-}
-function showCountOfMySupremes() {
-
-    async function downloadCountOfTokensForAcc(account_id) {
-        return new Promise((resolve, reject) => {
-            let _result = contract.nft_supply_for_owner({
-                account_id: account_id,
-            })
-            resolve(_result)
-            reject("error")
-        })
-    }
-
-    downloadCountOfTokensForAcc(contract_id).then(
+    //Получаем и устанавливаем количество всех супремов для зарегистрированного пользователя
+    getCountOfTokensForAcc(logged_user).then(
         result => {
             countOfSupremes = result
-            $("#countOfSupremesSpan").text(countOfSupremes)
-            $("#supremCount").text(countOfSupremes)
+            $("#allSupremes_count").text(countOfSupremes)
         },
         error => console.log(error)
     )
-}
 
-function showListOfMySupremes() {
-
-    async function downloadSupremesForAcc(account_id, from_index, limit) {
-        return new Promise((resolve, reject) => {
-            let _result = contract.nft_tokens_for_owner({
-                account_id: account_id,
-                from_index: from_index,
-                limit: limit,
-            })
-            resolve(_result)
-            reject("error")
-        })
-    }
-
-    async function getInfoOfDemandsForToken(token_id) {
-        const rawResult = await provider.query({
-            request_type: "call_function",
-            account_id: market_contract,
-            method_name: "get_list_of_demands_for",
-            args_base64: Buffer.from(JSON.stringify({
-                token_id: token_id,
-            })).toString('base64'),
-            finality: "optimistic",
-        });
-        const res = JSON.parse(Buffer.from(rawResult.result).toString())
-        return res
-    }
-
-    async function v_setListOfPersonalSupremesForAcc(arrOfSupremes) {
-        console.log(arrOfSupremes)
-        for (let [_, element] of arrOfSupremes.entries()) {
-            let token_id = parseInt(element.token_id)
-            await getInfoOfDemandsForToken(element.token_id).then(
-                result => {
-                    let max_bid = find_max_bid_in(result)
-                    let _element = supreme_mid_elem(token_id, max_bid, "600")
-                    $("#personalSupremes").append(_element)
+    //Получаем и заполняем список элементов всех супремов для зарегистрированного пользователя
+    getListOfAllSupremesForAcc(logged_user, String(allSupremesTab_currentStartIndex), allSupremesTab_limit).then(
+        result => {
+            let button = $("#allSupremes_showMore") 
+            v_setListOfPersonalSupremesForAcc(result)
+            //Ставим обработчик нажатий для кнопки "Загрузить еще"
+            setHandlerOn(
+                button, 
+                function () {
+                    allSupremesTab_currentStartIndex = allSupremesTab_currentStartIndex + allSupremesTab_limit
+                    getListOfAllSupremesForAcc(logged_user, String(allSupremesTab_currentStartIndex), allSupremesTab_limit).then(
+                        result => v_setListOfPersonalSupremesForAcc(result),
+                        error => console.log(error))
                 }
             )
-        }
-    }
-
-    function mySupremesTab_setHandlerOnUploadButton() {
-        $("#mySupremesTab_showmore").click(() => {
-            mySupremesTab_currentStartIndex = mySupremesTab_currentStartIndex + mySupremesTab_limit
-            downloadSupremesForAcc(contract_id, String(mySupremesTab_currentStartIndex), mySupremesTab_limit).then(
-                result => v_setListOfPersonalSupremesForAcc(result),
-                error => console.log(error)
-            )
-        })
-    }
-
-    downloadSupremesForAcc(contract_id, String(mySupremesTab_currentStartIndex), mySupremesTab_limit).then(
-        result => { 
-            v_setListOfPersonalSupremesForAcc(result)
-            mySupremesTab_setHandlerOnUploadButton()
         },
         error => console.log(error)
     )
 
-    function find_max_bid_in(arr) {
-        let max_bid = 0
-        for (let [_, element] of arr.entries()) {
-            let nbr = number_from_scientific_notation(element.price)
-            if (max_bid < nbr) {
-                max_bid = nbr
-            }
-        }
-        return max_bid
-    }
-    
-}
-
-function showCountOfMySupremesOnSale() {
-
-    async function getCountOfOffersForAcc() {
-        const rawResult = await provider.query({
-            request_type: "call_function",
-            account_id: market_contract,
-            method_name: "get_count_of_offers_for_acc",
-            args_base64: Buffer.from(JSON.stringify({
-                account_id: "fg10.testnet"
-            })).toString('base64'),
-            finality: "optimistic",
-        });
-
-        const res = JSON.parse(Buffer.from(rawResult.result).toString());
-
-        $("#numberOfMySupremsForSale").text(parseInt(res))
-    }
-
-    getCountOfOffersForAcc()
-}
-
-function showListOfMySupremesOnSale() {
-
-    async function getListOfOffersForAcc() {
-        const rawResult = await provider.query({
-            request_type: "call_function",
-            account_id: market_contract,
-            method_name: "get_list_of_offers_for_acc",
-            args_base64: Buffer.from(JSON.stringify({
-                account_id: "fg10.testnet",
-                fillContent_index: mySupremesOnSaleTab_currentStartIndex,
-                limit: mySupremesOnSaleTab_limit
-            })).toString('base64'),
-            finality: "optimistic",
-        });
-        const res = JSON.parse(Buffer.from(rawResult.result).toString())
-        return res
-    }
-
-    function mySupremesOnSaleTab_setListOfSupremes(res) {
-        for (let [_, element] of res.entries()) {
-            let token_id = Number(element[0])
-            let price = number_from_scientific_notation(element[1])
-            let _element = supreme_mid_elem(token_id, price, "600")
-            $("#personalSupremesOnSale").append(_element)
-        }
-    }
-
-    let mySupremesOnSaleTab_setHandlerOnUploadButton = () => {
-        $("#personalSupremesOnSaleTab_showmore").click(() => {
-            mySupremesOnSaleTab_currentStartIndex = mySupremesOnSaleTab_currentStartIndex + mySupremesOnSaleTab_limit
-            getListOfOffersForAcc().then(
-                result => mySupremesOnSaleTab_setListOfSupremes(result),
-                error => console.log(error)
-            )
-        })
-    }
-
-    getListOfOffersForAcc().then(
+    //Получаем и устанавливаем количество супремов на продаже для зарегистрированного пользователя
+    getCountOfOffersForAcc(logged_user).then(
         res => {
-                mySupremesOnSaleTab_setListOfSupremes(res)
-                mySupremesOnSaleTab_setHandlerOnUploadButton()
+            $("#offersTab_count").text(parseInt(res))
+        },
+        error => console.log(error)
+    )
+    //Получаем и заполняем список всех супремов на продаже для зарегистрированного пользователя    
+    getListOfOffersForAcc(logged_user, myOffersTab_currentStartIndex, myOffersTab_limit).then(
+        res => {
+                let tab = $("#offersTab_content")
+                let button = $("#offersTab_showmore")
+                fillTabOfSupremesWithData(tab, res)
+                setHandlerOn(
+                    button, 
+                    function () {
+                        myOffersTab_currentStartIndex = myOffersTab_currentStartIndex + myOffersTab_limit
+                        getListOfOffersForAcc(logged_user, myOffersTab_currentStartIndex, myOffersTab_limit).then(
+                            result => fillTabOfSupremesWithData(tab, result),
+                            error => console.log(error))
+                    }
+                )
         },
         error => {
             console.log("err")
         }
     )
 
+    //Получаем и устанавливаем количество предложений на другие супремы для зарегистрированного пользователя
+    getCountOfDemandsForAcc(logged_user).then(
+        res => {
+            $("#myDemands_count").text(parseInt(res))
+        },
+        error => console.log(error)
+    )
+    //Получаем и заполняем список всех предложений на другие супремы для зарегистрированного пользователя    
+    getListOfDemandsForAcc(logged_user).then(
+        res => {
+                let tab = $("#myDemands_content")
+                let button = $("#myDemands_showMore")
+                fillTabOfSupremesWithData(tab,res)
+                setHandlerOn(
+                    button, 
+                    function () {
+                        myDeamndsTab_currentStartIndex = myDeamndsTab_currentStartIndex + myDeamndsTab_limit
+                        getListOfDemandsForAcc(logged_user, myDeamndsTab_currentStartIndex, myDeamndsTab_limit).then(
+                            result => fillTabOfSupremesWithData(tab,result),
+                            error => console.log(error))
+                    }
+                )
+                
+        },
+        error => {
+            console.log("err")
+        }
+    )
+
+}
+
+function setHandlerOn(button, handler) {
+    button.click( () => {
+        handler()
+    })
+}
+
+function fillTabOfSupremesWithData(tab,res) {
+    for (let [_, element] of res.entries()) {
+        let token_id = Number(element[0])
+        let price = number_from_scientific_notation(element[1])
+        let _element = supreme_mid_elem(token_id, price, "600")
+
+        tab.append(_element)
+    }
 }
 
 let supreme_mid_elem = (token_id, price_near, price_dollar) => {

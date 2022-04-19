@@ -20,7 +20,16 @@ impl Contract {
     #[payable]
     pub fn make_demand_for_buying_token (&mut self, token_id: TokenId,) {
         let CALL_GAS = env::prepaid_gas() - env::used_gas() - GAS_RESERVED_FOR_CURRENT_CALL;
+        if let Some(token) = self.tokens_by_id.get(&token_id) {
+            let owner = token.owner_id;
+            let sender = env::signer_account_id();
 
+            assert_eq!(
+                owner != sender,
+                true,
+                "make_demand_for_buying_token::Owner couldn't buy self token"
+            );
+        }
         ext_market::make_demand_for_buying_token(
             token_id,
             MARKET_ACCOUNT_ID.parse().unwrap(),

@@ -107,7 +107,8 @@ impl Contract {
             n_s.insert(&demand_id);
             self.demand_token_ind.insert(&token_id, &n_s);
         } else {
-            let mut n_s: UnorderedSet<DemandId> = UnorderedSet::new(token_id.try_to_vec().unwrap());
+            let id = demand_id.to_string() + token_id;
+            let mut n_s: UnorderedSet<DemandId> = UnorderedSet::new(id.try_to_vec().unwrap());
             n_s.insert(&demand_id);
             self.demand_token_ind.insert(&token_id, &n_s);
         }
@@ -119,7 +120,8 @@ impl Contract {
             n_s.insert(&demand_id);
             self.demand_acc_ind.insert(&buyer, &n_s);
         } else {
-            let mut n_s: UnorderedSet<DemandId> = UnorderedSet::new(buyer.try_to_vec().unwrap());
+            let id = demand_id.to_string() + buyer.as_str();
+            let mut n_s: UnorderedSet<DemandId> = UnorderedSet::new(id.try_to_vec().unwrap());
             n_s.insert(&demand_id);
             self.demand_acc_ind.insert(&buyer, &n_s);
         }
@@ -296,7 +298,7 @@ impl Contract {
                 .take(limit.unwrap_or(50) as usize)
                 //we'll map the token IDs which are strings into Json Tokens
                 .map(|demand_id| {
-                    (self.demand.get(&demand_id).unwrap().token_id, self.demand.get(&demand_id).expect("get_list_of_offers_for_acc::no such offer").price)
+                    (self.demand.get(&demand_id).unwrap().token_id, self.demand.get(&demand_id).expect("get_list_of_demands_for_acc::no such demand").price)
                 }).collect();
             return pairs;
                 //since we turned the keys into an iterator, we need to turn it back into a vector to return
