@@ -287,7 +287,7 @@ td {
   height: 128px;
   margin-top: -32px;
   margin-left: -32px;
-  background: url('/css/sources/Preloader_1.gif') no-repeat 50% 50%; /*расположение (url) изображения gif и др. параметры*/
+  background: url('/css/sources/Preloader_1.gif') no-repeat 50% 50%; /*пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (url) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ gif пїЅ пїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ*/
 }
 
 .loaded_hiding .preloader {
@@ -307,5 +307,25 @@ td {
 display: block;
     width: 100%;
     height: 100%;
-}}
+}
+
+button {
+    border: none;
+    padding: 10px;
+    /* color: #212529; */
+    border-radius: 7px !important;
+    font-size: 18px !important;
+}
+
+button.green {
+    background: #66bb6a;
+}
+
+button.red {
+    background: #ef5350;
+}
+
+button.yellow {
+    background: #ffee58;
+}
 

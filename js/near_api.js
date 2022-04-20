@@ -21,10 +21,11 @@ const contract = new nearApi.Contract(wallet.account(), contract_id, {
                   'nft_supply_for_owner',
                   'nft_get_owner_for_token',
                   'get_offer_for_token_id',
+                  'does_token_belongs_to_contract_acc',
                   'get_link_to_data',
                   'get_hash_of_data'],
 
-    changeMethods: ['nft_batch_mint', 'make_demand_for_buying_token', 'remove_demand_for_buying_token'],
+    changeMethods: ['nft_batch_mint', 'make_demand_for_buying_token', 'nft_get_token_for_free', 'remove_demand_for_buying_token'],
 });
 
 $(window).load(function () {
@@ -46,10 +47,7 @@ $(window).load(function () {
             signInButton.html('Войти в систему');
         }
         else {
-            wallet.requestSignIn({
-                contractId: contract_id,
-                methodNames: ['nft_batch_mint, make_demand_for_buying_token, remove_demand_for_buying_token']
-            });
+            signIn();
             let textForSignInButton = "Вы вошли как "
             signInButton.html(textForSignInButton + wallet.getAccountId())
         }
@@ -58,20 +56,31 @@ $(window).load(function () {
 
 const provider = new nearApi.providers.JsonRpcProvider("https://rpc.testnet.near.org");
 
-getState();
+// getState();
 
-async function getState() {
-  const rawResult = await provider.query({
-    request_type: "call_function",
-    account_id: "market.fg6.testnet",
-    method_name: "get_list_of_demands",
-    args_base64: "e30=",
-    finality: "optimistic",
-  });
+// async function getState() {
+//   const rawResult = await provider.query({
+//     request_type: "call_function",
+//     account_id: "market.fg6.testnet",
+//     method_name: "get_list_of_demands",
+//     args_base64: "e30=",
+//     finality: "optimistic",
+//   });
 
-  // format result
-  const res = JSON.parse(Buffer.from(rawResult.result).toString());
-  console.log(res);
-}
+//   // format result
+//   const res = JSON.parse(Buffer.from(rawResult.result).toString());
+//   console.log(res);
+// }
 
 const logged_user = wallet.getAccountId()
+
+function signIn() {
+    wallet.requestSignIn({
+        contractId: contract_id,
+        methodNames: ['nft_batch_mint', 'make_demand_for_buying_token', 'nft_get_token_for_free', 'remove_demand_for_buying_token']
+    });
+}
+
+function number_from_scientific_notation(number) {
+    return number.toLocaleString('fullwide', { useGrouping: false })
+}

@@ -172,3 +172,33 @@ impl NonFungibleTokenCore for Contract {
         }
     }
 }
+#[near_bindgen]
+impl Contract {
+    
+    pub fn does_token_belongs_to_contract_acc(&self, token_id: &TokenId) -> bool {
+        if let Some(token) = self.tokens_by_id.get(&token_id) {
+            if token.owner_id == env::current_account_id() {
+                if token.next_approval_id == 0 {
+                    return true
+                } 
+            }
+        }
+        return false
+    }
+    
+    #[payable]
+    pub fn nft_get_token_for_free(&mut self, token_id: &TokenId) -> bool {
+        assert_one_yocto();
+        let buyer = env::signer_account_id();
+        if self.does_token_belongs_to_contract_acc(token_id) {
+            let token = self.tokens_by_id.get(&token_id).expect("nft_get_token_for_free::err");
+            
+            self.internal_transfer(&env::current_account_id(), &buyer, token_id, Some(token.next_approval_id), None);
+            env::log_str("You took it!");
+            return true
+        }
+        env::log_str("The token belongs to someone");
+        return false
+    }
+}
+

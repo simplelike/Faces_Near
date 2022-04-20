@@ -156,3 +156,27 @@ async function getOfferForTokenId(token_id) {
     console.log(res)
     return res
 }
+
+async function doesTokenBelongsToContractAcc(token_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.does_token_belongs_to_contract_acc({
+            token_id: token_id,
+        })
+        resolve(_result)
+        reject("error")
+    })
+}
+
+async function nftGetTokenForFree(token_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.nft_get_token_for_free(
+            {
+                token_id: token_id,
+            },
+            "300000000000000", // attached GAS (optional)
+            "1" // attached deposit in yoctoNEAR (optional)
+            )
+        resolve(_result)
+        reject("error")
+    })
+}

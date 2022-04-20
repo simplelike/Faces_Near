@@ -1,13 +1,46 @@
 let data
+
 var queryDict = {}
 location.search.substr(1).split("&").forEach(function (item) {
     queryDict[item.split("=")[0]] = item.split("=")[1]
 })
 let id = queryDict.id
 let number = parseInt(id) + 1
+
 localForageHandler(_start)
 
+const set_green_data_elem = (data) => {
+    return `<span class = 'greenColor'>${data}</span>`
+}
+const set_red_data_elem = (data) => {
+    return `<span class = 'redColor'>${data}</span>`
+}
+const near_logo = () => {
+    return `<img style='width: 50px;' src= '/sources/nearCircleLogo.png'>`
+}
+const button = (color, text, handler) => {
+    let color_class;
+    switch (color) {
+        case "red":
+            color_class = "red"    
+        break
+        case "green":
+            color_class = "green" 
+            break
+        default:
+            color_class = "yellow" 
+            break;
 
+    }
+    let button = document.createElement('button')
+    $(button).addClass(color_class)
+            .text(text).click(
+                () => {
+                    handler()
+                }
+            )
+    return button
+}
 
 function _start(v) {
     data = v[id]
@@ -16,24 +49,15 @@ function _start(v) {
     setNumber(data.nbr)
     setRarity(data.rrt)
 
-    getOwnerOfToken(id).then(
+    setOwnerInfoContentDiv()
+
+    setDemandsInfoContentTable()
+
+    getInfoOfDemandsForToken(id).then(
         result => {
-            setCurrentOwner(result)
-        },
-        error => console.log("err")
+            setDemandsInfoContentTable(result)
+        }
     )
-
-    setFirstOwner("ivtanart.near")
-    
-    getOfferForTokenId(id).then(
-        result => {
-            setTotalPrice(result)
-        },
-        error => console.log(error)
-    )
-   
-
-
 
     setContentForAttrComponent("jeweleryAttrComponent", "Украшение", data.j_a.t_c, data.j_a.T)
     setContentForAttrComponent("backgroundAttrComponent", "Фон", data.b_a.t_c, data.b_a.T)
@@ -45,6 +69,72 @@ function _start(v) {
     setContentForAttrComponent("faceAttrComponent", "Лицо", data.f_a.t_c, data.f_a.T)
 
     $('.preloader').fadeOut().end().delay(400).fadeOut('slow')
+}
+
+function setOwnerInfoContentDiv() {
+    doesTokenBelongsToContractAcc(id).then(
+        r => {
+            switch(r) {
+                case true: {
+                    setOwnerInfoContentDivForNoOnesToken()
+                    break
+                }
+                default: {
+                    setOwnerInfoContentDivForOwnersToken()
+                    break
+                }
+            }
+        }
+    )
+}
+
+function setOwnerInfoContentDivForNoOnesToken() {
+    //$("#ownerInfoContent").html("")
+    $("#noOnesTokenInfo").append(button("green", "Станьте первым владельцем токена", () => {
+        if (wallet.isSignedIn()) {
+            nftGetTokenForFree(id).then(
+                result => {
+                    console.log(result)
+                }
+            )
+        }
+        else {
+            signIn()
+        }
+    }))
+}
+
+function setOwnerInfoContentDivForOwnersToken() {
+    getOwnerOfToken(id).then(
+        result => {
+            setCurrentOwner(result)
+        },
+        error => console.log("err")
+    )
+
+    setFirstOwner("Получить из контракта")
+    
+    getOfferForTokenId(id).then(
+        result => {
+            let price = result == null ? "Пока нет предложений о продаже" : nearApi.utils.format.formatNearAmount(number_from_scientific_notation(result.price))
+            setTotalPrice(price)
+            if (result.sailer !== logged_user) {
+                showMakeDemandButton()
+            }
+        },
+        error => console.log(error)
+    )
+}
+
+function setDemandsInfoContentTable(data) {
+    if (data === null || data === undefined || data === "") return
+
+    $("#demandsData").attr("display", "block");
+    for (let [_, element] of data.entries()) {
+        let tr = `<tr><td>${element.buyer_acc}</td><td>${convert_sum(element.price)}</td><td>Кнопка</td></tr>`
+        $("#tableOfDemandsOnToken tbody").append(tr)
+    }
+
 }
 
 function setContentForAttrComponent(id, title, count, choosenElementTitle) {
@@ -75,23 +165,25 @@ function setNumber(number) {
 }
 
 function setRarity(rarity) {
-    $('#rarityDiv').append("Редкость - <span class = 'greenColor'>" + rarity + "</span>");
+    $('#rarityDiv').append(`Редкость - ${set_green_data_elem(rarity)}`);
 }
 
 function setCurrentOwner(currentOwner) {
-    $('#currentOwner').append("Текущий владелец: <span class = 'greenColor'>" + currentOwner + "</span>");
+    console.log(currentOwner)
+    $('#currentOwner').append(`Текущий владелец: ${set_green_data_elem(currentOwner)}`);
 }
 
 function setFirstOwner(firstOwner) {
-    $('#firstOwner').append("Первый владелец: <span class = 'redColor'>" + firstOwner + "</span>");
+    $('#firstOwner').append(`Первый владелец: ${set_red_data_elem(firstOwner)}`);
 }
 
 function setTotalPrice(totalPrice) {
-    if (totalPrice === null) {
-        $('#totalpriceDiv').append("<span class = 'greenColor'>Предложений нет </span>" + make_demand_button());
-        return
-    }
-    $('#totalpriceDiv').append("<span class = 'greenColor'>" + totalPrice + "</span> <img style='width: 50px;' src= '/sources/nearCircleLogo.png'>" + make_demand_button());
+    $('#totalpriceDiv').append(`${set_green_data_elem(totalPrice)} ${near_logo()}`)
+}
+function showMakeDemandButton() {
+    $('#makeDemandButtonDiv').append(button("green", "Предложить цену", () => {
+        tooggleDemandInputView()
+    }))
 }
 
 function setImageToDiv(src, hash) {
@@ -114,4 +206,8 @@ function tooggleDemandInputView() {
         alert($("#make_demand_input").val())
     }
     $('#makeDemandInput').toggle();
+}
+
+function convert_sum(sum) {
+    return nearApi.utils.format.formatNearAmount(number_from_scientific_notation(sum))
 }

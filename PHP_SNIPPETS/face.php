@@ -16,21 +16,32 @@
     <div class="row">
         <div class="col align-self-center centerContent faceInfo" id="rarityDiv"></div>
     </div>
-    <div class="row">
-        <div class="col align-self-center centerContent faceInfo" id="totalpriceDiv"></div>
-    </div>
-    <div class="row">
-        <div class="col align-self-center centerContent faceInfo no-vis" id="makeDemandInput">
-            <input id = "make_demand_input" type = "number">
+    <div id="ownerInfoContent">
+        <div class="row">
+            <div class="col align-self-center centerContent faceInfo" id="totalpriceDiv"></div>
+        </div>
+        <div class="row">
+            <div class="col align-self-center centerContent faceInfo" id="makeDemandButtonDiv"></div>
+        </div>
+        <div class="row">
+            <div class="col align-self-center centerContent faceInfo no-vis" id="makeDemandInput">
+                <input id="make_demand_input" type="number">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col align-self-center centerContent faceInfo" id="currentOwner"></div>
+        </div>
+        <div class="row">
+            <div class="col align-self-center centerContent faceInfo" id="firstOwner"></div>
+        </div>
+        <div class="row">
+            <div class="col align-self-center centerContent" id="noOnesTokenInfo"></div>
         </div>
     </div>
-    <div class="row">
-        <div class="col align-self-center centerContent faceInfo" id="currentOwner"></div>
-    </div>
-    <div class="row">
-        <div class="col align-self-center centerContent faceInfo" id="firstOwner"></div>
-    </div>
+
+
 </div>
+
 <div class="container-fluid marginContent containerFluidPadding">
     <div class="row marginContent">
         <div class="col">
@@ -61,6 +72,44 @@
         </div>
     </div>
 </div>
+<div id="demandsData">
+    <div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px;">
+        <div class="row">
+            <div class="col-4 littleTitle">
+                Список предложений о покупке
+            </div>
+            <div class="col-8 littleTitle">
+                <div class="row">
+                    <div class="col-4 littleTitle">
+                        Предложить свою цену
+                    </div>
+                    <div class="col-4 littleTitle">
+                        <input type="text">
+                    </div>
+                    <div class="col-4 littleTitle">
+                        <a href="#" class="offerButton button" onClick='alert("here")'> Предложить </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container marginContent table-responsive-md">
+        <table class="table" id="tableOfDemandsOnToken">
+            <thead>
+                <tr>
+                    <td class="littleTitle">Аккаунт покупателя</td>
+                    <td class="littleTitle">Предложение</td>
+                    <td class="littleTitle"></td>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
 <div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px; ">
     <div class="row">
         <div class="col littleTitle">
@@ -83,7 +132,7 @@
                 <td class="littleTitle">Кому</td>
                 <td class="littleTitle">Стоимость <img style='width: 20px;' src='/sources/nearCircleLogo.png'> </td>
                 <td class="littleTitle">Дата</td>
-                <td class = "noneBorderTop"></td>
+                <td class="noneBorderTop"></td>
             </tr>
         </thead>
         <tbody>
@@ -93,15 +142,15 @@
                 <td class="cancelPrice"></td>
                 <td class="cancelPrice">0</td>
                 <td class="cancelPrice">23.10.2021</td>
-                <td class = "noneBorderTop"></td>
+                <td class="noneBorderTop"></td>
             </tr>
             <tr>
                 <td class="waitingPrice">Предложение</td>
-                <td class="waitingPrice" >www.near</td>
-                <td class="waitingPrice" ></td>
-                <td class="waitingPrice" >450</td>
-                <td class="waitingPrice" >13.10.2021</td>
-                <td class = "noneBorderTop">
+                <td class="waitingPrice">www.near</td>
+                <td class="waitingPrice"></td>
+                <td class="waitingPrice">450</td>
+                <td class="waitingPrice">13.10.2021</td>
+                <td class="noneBorderTop">
                     <a href="#" class="cancelButton button arrow" onClick='alert("here")'> Отозвать </a>
                 </td>
             </tr>
@@ -111,7 +160,7 @@
                 <td class="waitingPrice"></td>
                 <td class="waitingPrice">400</td>
                 <td class="waitingPrice">10.10.2021</td>
-                <td class = "noneBorderTop">
+                <td class="noneBorderTop">
                     <a href="#" class="cancelButton button arrow" onClick='alert("here")'> Отозвать </a>
                 </td>
             </tr>
@@ -121,7 +170,7 @@
                 <td class="dealPrice">x.near</td>
                 <td class="dealPrice">100</td>
                 <td class="dealPrice">05.10.2021</td>
-                <td class = "noneBorderTop"></td>
+                <td class="noneBorderTop"></td>
             </tr>
             <tr>
                 <td>Первый владелец</td>
@@ -129,7 +178,7 @@
                 <td>ivtanart.near</td>
                 <td></td>
                 <td>01.10.2021</td>
-                <td class = "noneBorderTop"></td>
+                <td class="noneBorderTop"></td>
             </tr>
         </tbody>
     </table>
@@ -151,11 +200,10 @@
     }
 
     .noneBorderTop {
-        border-top: none!important;
+        border-top: none !important;
     }
 
     .no-vis {
         display: none;
     }
-
 </style>

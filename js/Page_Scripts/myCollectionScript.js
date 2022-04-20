@@ -139,7 +139,3 @@ let supreme_mid_elem = (token_id, price_near, price_dollar) => {
                 `</div>` +
             `<div>`
 }
-
-function number_from_scientific_notation(number) {
-    return number.toLocaleString('fullwide', { useGrouping: false })
-}

@@ -21,17 +21,17 @@
         </div>
         <div class="col-4 centerContent">
             <div class = "bigTitle">Активность:</div>
-            <div class="littleTitle" id="activity">12.10.2021 16:00</div>
+            <div class="littleTitle" id="activity">12.10.2021 16:00 (Получать из базы?)</div>
         </div>
         <div class="col-4 centerContent">
             <div class = "bigTitle">Общие затраты на покупку Супремов:</div>
-            <div class="littleTitle" id="totalCost">125 <img style='width: 20px;' src='/sources/nearCircleLogo.png'> ($823)</div>
+            <div class="littleTitle" id="totalCost"><span style = "color:red">Получать из базы</span> <img style='width: 20px;' src='/sources/nearCircleLogo.png'> ($823)</div>
         </div>
     </div>
     <div class="row marginContent">
         <div class="col-4 centerContent">
             <div class = "bigTitle">Предложения на моих Супремов:</div>
-            <div class="littleTitle" id="supremOffer">5</div>
+            <div class="littleTitle" id="supremOffer"></div>
         </div>
         <div class="col-4 centerContent">
             <div class = "bigTitle">Сумма ставок на моих Супремов:</div>
@@ -53,7 +53,7 @@
         </div>
         <div class="col-4 centerContent">
             <div class = "bigTitle">Наблюдатели:</div>
-            <div class="littleTitle" id="supremSaleSum">12</div>
+            <div class="littleTitle" id="supremSaleSum"><span style = "color:red">12 ???</span></div>
         </div>
     </div>
 </div>
