@@ -9,15 +9,6 @@ let number = parseInt(id) + 1
 
 localForageHandler(_start)
 
-const set_green_data_elem = (data) => {
-    return `<span class = 'greenColor'>${data}</span>`
-}
-const set_red_data_elem = (data) => {
-    return `<span class = 'redColor'>${data}</span>`
-}
-const near_logo = () => {
-    return `<img style='width: 50px;' src= '/sources/nearCircleLogo.png'>`
-}
 const button = (color, text, handler) => {
     let color_class;
     switch (color) {
@@ -208,6 +199,3 @@ function tooggleDemandInputView() {
     $('#makeDemandInput').toggle();
 }
 
-function convert_sum(sum) {
-    return nearApi.utils.format.formatNearAmount(number_from_scientific_notation(sum))
-}

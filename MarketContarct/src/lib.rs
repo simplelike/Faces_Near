@@ -24,6 +24,7 @@ pub enum StorageKey {
 mod offer_db;
 mod offer_db_view_methods;
 mod demand_db;
+mod demand_db_view_methods;
 mod make_deal_mod;
 
 #[derive(Serialize, Deserialize)]

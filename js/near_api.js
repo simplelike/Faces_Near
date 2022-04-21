@@ -22,8 +22,9 @@ const contract = new nearApi.Contract(wallet.account(), contract_id, {
                   'nft_get_owner_for_token',
                   'get_offer_for_token_id',
                   'does_token_belongs_to_contract_acc',
+                  'nft_tokens_id_for_acc',
                   'get_link_to_data',
-                  'get_hash_of_data'],
+                  'get_hash_of_data',],
 
     changeMethods: ['nft_batch_mint', 'make_demand_for_buying_token', 'nft_get_token_for_free', 'remove_demand_for_buying_token'],
 });
@@ -56,22 +57,6 @@ $(window).load(function () {
 
 const provider = new nearApi.providers.JsonRpcProvider("https://rpc.testnet.near.org");
 
-// getState();
-
-// async function getState() {
-//   const rawResult = await provider.query({
-//     request_type: "call_function",
-//     account_id: "market.fg6.testnet",
-//     method_name: "get_list_of_demands",
-//     args_base64: "e30=",
-//     finality: "optimistic",
-//   });
-
-//   // format result
-//   const res = JSON.parse(Buffer.from(rawResult.result).toString());
-//   console.log(res);
-// }
-
 const logged_user = wallet.getAccountId()
 
 function signIn() {
@@ -81,6 +66,3 @@ function signIn() {
     });
 }
 
-function number_from_scientific_notation(number) {
-    return number.toLocaleString('fullwide', { useGrouping: false })
-}

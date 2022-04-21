@@ -106,4 +106,14 @@ impl Contract {
         }
         return None
     }
+
+    pub fn get_sum_of_bids_on_offers_for_acc(&self, account_id: &AccountId) -> u128 {
+        let mut r_v = 0;
+        if let Some(tokens_id_set) = self.offer_acc_ind.get(account_id) {
+            for token_id in tokens_id_set.iter() {
+                r_v = r_v + self.offer.get(&token_id).expect("get_sum_of_bids_on_offers_for_acc::no offer").price;
+            } 
+        }
+        return r_v;
+    }
 }

@@ -38,13 +38,15 @@ async function v_setListOfPersonalSupremesForAcc(arrOfSupremes) {
     console.log(arrOfSupremes)
     for (let [_, element] of arrOfSupremes.entries()) {
         let token_id = parseInt(element.token_id)
-        await getInfoOfDemandsForToken(element.token_id).then(
+        let _element = supreme_mid_elem(token_id, "", "")
+        $("#allSupremes_content").append(_element)
+        /*await getInfoOfDemandsForToken(element.token_id).then(
             result => {
                 let max_bid = find_max_bid_in(result)
                 let _element = supreme_mid_elem(token_id, max_bid, "600")
                 $("#allSupremes_content").append(_element)
             }
-        )
+        )*/
     }
 }
 
@@ -127,7 +129,104 @@ function find_max_bid_in(arr) {
     return max_bid
 }
 
+async function getListOfTokensForAcc(account_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.nft_tokens_id_for_acc({
+            account_id: account_id,
+        })
+        resolve(_result)
+        reject("error")
+    })
+}
 
+async function getCountOfDemandsForTokensList(tokensArr) {
+    let obj = {
+        list_of_tokens_id: tokensArr
+    }
+    const rawResult = await provider.query({
+        request_type: "call_function",
+        account_id: market_contract,
+        method_name: "get_count_of_demands_for_tokens_list",
+        args_base64: Buffer.from(JSON.stringify({
+            supremes_json: JSON.stringify(obj),
+        })).toString('base64'),
+        finality: "optimistic",
+    });
+
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
+
+    return res
+}
+
+async function getSumOfBidsOnDemandsForTokensList(tokensArr) {
+    let obj = {
+        list_of_tokens_id: tokensArr
+    }
+    const rawResult = await provider.query({
+        request_type: "call_function",
+        account_id: market_contract,
+        method_name: "get_sum_of_bids_on_demands_for_tokens_list",
+        args_base64: Buffer.from(JSON.stringify({
+            supremes_json: JSON.stringify(obj),
+        })).toString('base64'),
+        finality: "optimistic",
+    });
+
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
+
+    return res
+}
+
+async function getSumOfBidsOnDemandsForAcc(account_id) {
+    const rawResult = await provider.query({
+        request_type: "call_function",
+        account_id: market_contract,
+        method_name: "get_sum_of_bids_on_demands_for_acc",
+        args_base64: Buffer.from(JSON.stringify({
+            account_id: account_id,
+        })).toString('base64'),
+        finality: "optimistic",
+    });
+
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
+
+    return res
+}
+
+async function getListOfDemandsForListOfTokenIds(tokensArr) {
+    let obj = {
+        list_of_tokens_id: tokensArr
+    }
+    const rawResult = await provider.query({
+        request_type: "call_function",
+        account_id: market_contract,
+        method_name: "get_list_of_demands_for_list_of_token_ids",
+        args_base64: Buffer.from(JSON.stringify({
+            token_ids: JSON.stringify(obj),
+        })).toString('base64'),
+        finality: "optimistic",
+    });
+
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
+
+    return res
+}
+
+async function getSumOfBidsOnOffersForAcc(account_id) {
+    const rawResult = await provider.query({
+        request_type: "call_function",
+        account_id: market_contract,
+        method_name: "get_sum_of_bids_on_offers_for_acc",
+        args_base64: Buffer.from(JSON.stringify({
+            account_id: account_id,
+        })).toString('base64'),
+        finality: "optimistic",
+    });
+
+    const res = JSON.parse(Buffer.from(rawResult.result).toString());
+
+    return res
+}
 
 ////Face Page functions
 

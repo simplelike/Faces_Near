@@ -25,6 +25,15 @@ pub fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<Js
         .collect()
 }
 
+pub fn nft_tokens_id_for_acc(&self, account_id: &AccountId) -> Vec<TokenId> {
+    if let Some (_vec) = self.tokens_per_owner.get(&account_id){
+        return _vec.to_vec()
+    }
+    else {
+        return vec![]
+    }
+}
+
 pub fn nft_supply_for_owner(
     &self,
     account_id: AccountId,

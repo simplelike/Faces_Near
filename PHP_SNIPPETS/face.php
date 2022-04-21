@@ -72,7 +72,7 @@
         </div>
     </div>
 </div>
-<div id="demandsData">
+<div id="demandsData" style = "display: none">
     <div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px;">
         <div class="row">
             <div class="col-4 littleTitle">

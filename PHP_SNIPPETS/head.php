@@ -20,4 +20,6 @@
     <script src="/js/localForageSync.js"></script>
     <script src="/js/objectHash.min.js"></script>
     <script src="/js/getDataFromContract.js"></script>
+    <script src="/js/getNearValue.js"></script>
+    <script src="/js/internal.js"></script>
 </head>
