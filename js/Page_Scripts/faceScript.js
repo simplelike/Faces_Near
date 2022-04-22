@@ -39,16 +39,19 @@ function _start(v) {
     setUrlPath(data.g_h)
     setNumber(data.nbr)
     setRarity(data.rrt)
-
     setOwnerInfoContentDiv()
 
-    setDemandsInfoContentTable()
+    setListOfOffers()
+    //setListOfDemands()
+
+
+    /*setDemandsInfoContentTable()
 
     getInfoOfDemandsForToken(id).then(
         result => {
             setDemandsInfoContentTable(result)
         }
-    )
+    )*/
 
     setContentForAttrComponent("jeweleryAttrComponent", "Украшение", data.j_a.t_c, data.j_a.T)
     setContentForAttrComponent("backgroundAttrComponent", "Фон", data.b_a.t_c, data.b_a.T)
@@ -105,19 +108,44 @@ function setOwnerInfoContentDivForOwnersToken() {
 
     setFirstOwner("Получить из контракта")
     
-    getOfferForTokenId(id).then(
+    /*getOfferForTokenId(id).then(
         result => {
             let price = result == null ? "Пока нет предложений о продаже" : nearApi.utils.format.formatNearAmount(number_from_scientific_notation(result.price))
             setTotalPrice(price)
-            if (result.sailer !== logged_user) {
-                showMakeDemandButton()
-            }
+            // if (result.sailer !== logged_user) {
+            //     showMakeDemandButton()
+            // }
         },
         error => console.log(error)
+    )*/
+}
+
+function setListOfOffers() {
+    getOfferForTokenId(id).then(
+        offer => {
+            setOffersForTokenIdTable(offer)
+        },
+        error => {
+            console.log(error)
+        }
     )
+
+    function setOffersForTokenIdTable(offer) {
+        let table = $("#offerTable tbody")
+        if (offer === null) {
+            add_table_tr_to(table, "Пока нет предложений", "-")
+        }
+        else {
+            let sailer = offer.sailer
+            let price = convert_sum(offer.price)
+            let price_el = price_elem(price)
+            add_table_tr_to(table, sailer, price_el)
+        }
+    }
 }
 
 function setDemandsInfoContentTable(data) {
+    let tr = ""
     if (data === null || data === undefined || data === "") return
 
     $("#demandsData").attr("display", "block");
@@ -169,7 +197,7 @@ function setFirstOwner(firstOwner) {
 }
 
 function setTotalPrice(totalPrice) {
-    $('#totalpriceDiv').append(`${set_green_data_elem(totalPrice)} ${near_logo()}`)
+    $('#totalpriceDiv').append(`${set_green_data_elem(totalPrice)} ${near_logo}`)
 }
 function showMakeDemandButton() {
     $('#makeDemandButtonDiv').append(button("green", "Предложить цену", () => {

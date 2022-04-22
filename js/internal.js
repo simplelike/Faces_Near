@@ -12,8 +12,20 @@ function number_from_scientific_notation(number) {
     return number.toLocaleString('fullwide', { useGrouping: false })
 }
 
+function add_table_tr_to (table, first_td_content, second_td_content, buttonText = "", buttonHandler = () => { }) {
+    let elem = `<tr>
+                        <td>${first_td_content}</td>
+                        <td>${second_td_content}</td>
+                    </tr>`;
+    table.append(elem);
+}
+
 function convert_sum(sum) {
     return nearApi.utils.format.formatNearAmount(number_from_scientific_notation(sum))
+}
+
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
 }
 
 function setCookie(cname, cvalue, exdays) {
@@ -37,4 +49,16 @@ function getCookie(cname) {
       }
     }
     return "";
-  }
+}
+
+const price_elem = (price) => {
+
+    convertNearToUSD(price).then(
+        dollar_price => {
+            console.log(dollar_price)
+            return `${set_green_data_elem("<b>"+price+"</b>" + "($"+dollar_price+")")}`
+        }
+    )
+    
+    //return `${set_green_data_elem("<b>"+price+"</b>" + "($"+convertNearToUSD(price)+")")}`
+}

@@ -5,17 +5,13 @@ function loading_near_price_info(callback = () => {}) {
         tryCount: 0,
         retryLimit: 3,
         async: false,
-        success: function (data) {
-            callback(data)
-        },
         error: function (xhr, textStatus, errorThrown) {
             console.log(textStatus)
         },
+        complete: function(response) {
+            callback(response.responseJSON)
+        }
     })
-}
-
-function isEmpty(obj) {
-    return Object.keys(obj).length === 0;
 }
 
 function setPriceTo(elem, price) {
@@ -36,12 +32,15 @@ function setPriceTo(elem, price) {
 }
 
 function convertNearToUSD(sum) {
-    if (isEmpty(near_price)) {
-        loading_near_price_info( () => {
-            return (sum * near_price.near.usd).toFixed(3)
-        })
-    }
-    else {
-        return (sum * near_price.near.usd).toFixed(3)
-    }
+    loading_near_price_info( (r) => {
+        console.log(r)
+        if (r.near.usd === undefined) {
+            alert("here")
+        }
+        if (r.near.usd != undefined) {
+            let usd_price = (sum * r.near.usd).toFixed(3)
+            return usd_price
+        }
+        else return ""
+    })
 }

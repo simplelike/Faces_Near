@@ -38,8 +38,6 @@
             <div class="col align-self-center centerContent" id="noOnesTokenInfo"></div>
         </div>
     </div>
-
-
 </div>
 
 <div class="container-fluid marginContent containerFluidPadding">
@@ -72,34 +70,37 @@
         </div>
     </div>
 </div>
-<div id="demandsData" style = "display: none">
-    <div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px;">
-        <div class="row">
-            <div class="col-4 littleTitle">
-                Список предложений о покупке
-            </div>
-            <div class="col-8 littleTitle">
-                <div class="row">
-                    <div class="col-4 littleTitle">
-                        Предложить свою цену
-                    </div>
-                    <div class="col-4 littleTitle">
-                        <input type="text">
-                    </div>
-                    <div class="col-4 littleTitle">
-                        <a href="#" class="offerButton button" onClick='alert("here")'> Предложить </a>
-                    </div>
-                </div>
-            </div>
+<div class = "container" id="demandsData" style=" margin-top: 30px; ">
+    <div class = "row">
+        <div class="col-12">
+            <h3>Список предложений</h3>
         </div>
     </div>
-
-    <div class="container marginContent table-responsive-md">
-        <table class="table" id="tableOfDemandsOnToken">
+    <div class = "row" style=" margin-top: 30px; ">
+        <div class="col-12">
+            <h4>Предложения о продаже</h4>
+        </div>
+        <table class="table" id="offerTable">
             <thead>
                 <tr>
-                    <td class="littleTitle">Аккаунт покупателя</td>
-                    <td class="littleTitle">Предложение</td>
+                    <td class="littleTitle">Аккаунт</td>
+                    <td class="littleTitle">Стоимость</td>
+                    <td class="littleTitle"></td>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class = "row">
+        <div class="col-12">
+        <h4> Предложения о покупке<h4>
+        </div>
+        <table class="table" id="offerTable">
+            <thead>
+                <tr>
+                    <td class="littleTitle">Аккаунт</td>
+                    <td class="littleTitle">Стоимость</td>
                     <td class="littleTitle"></td>
                 </tr>
             </thead>
@@ -110,7 +111,7 @@
 </div>
 
 
-<div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px; ">
+<!--div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px; ">
     <div class="row">
         <div class="col littleTitle">
             История владения
@@ -182,7 +183,7 @@
             </tr>
         </tbody>
     </table>
-</div>
+</div-->
 
 <style type="text/css">
     .arrow {

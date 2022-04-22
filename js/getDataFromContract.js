@@ -252,7 +252,6 @@ async function getOfferForTokenId(token_id) {
     });
 
     const res = JSON.parse(Buffer.from(rawResult.result).toString());
-    console.log(res)
     return res
 }
 
