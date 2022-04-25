@@ -191,15 +191,16 @@ let supreme_mid_elem = (token_id, price_near ="", additionalData = "") => {
     let pic_id = token_id + 1.0
     let price_near_frmt = ""
     let price_near_data = ""
-    let price_dollar_data = ""
+    let price_dollar_elem = ""
     if (price_near !== "")
     {
         price_near_frmt = convert_sum(price_near)
         price_near_data =  `<div class="centerContent" style=" padding-top: 10px; ">` +
                                 `<b>${price_near_frmt}</b> ${near_logo}` +
                             `</div>`
-        price_dollar_data = `${set_green_data_elem("($" + convertNearToUSD(price_near_frmt) + ")")}`
-        
+        let id = make_id()
+        convertNearToUSD(price_near_frmt, id)
+        price_dollar_elem = create_green_data_elem("", id)      
     }
 
     return `<div class="col-1">` +
@@ -207,7 +208,7 @@ let supreme_mid_elem = (token_id, price_near ="", additionalData = "") => {
                     `<img src="/previewData/smallPreview/${pic_id}.png"` +
                 `</a>` +
                 `${price_near_data}` +
-                `${price_dollar_data}` +
+                `${price_dollar_elem}` +
                 `${additionalData}` +
             `<div>`
 }

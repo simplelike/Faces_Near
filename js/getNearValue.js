@@ -4,7 +4,6 @@ function loading_near_price_info(callback = () => {}) {
         type: "GET",
         tryCount: 0,
         retryLimit: 3,
-        async: false,
         error: function (xhr, textStatus, errorThrown) {
             console.log(textStatus)
         },
@@ -15,7 +14,7 @@ function loading_near_price_info(callback = () => {}) {
 }
 
 function setPriceTo(elem, price) {
-    let price_in_near = convert_sum(price)
+    /*let price_in_near = convert_sum(price)
 
     if (isEmpty(near_price)) {
         loading_near_price_info( (r) => {
@@ -27,19 +26,24 @@ function setPriceTo(elem, price) {
     else {
         let usd_price = (price_in_near * near_price.near.usd).toFixed(3)
         elem.append( `${price_in_near} ${near_logo} ${set_green_data_elem("($" + usd_price + ")")}`)
-    }
+    }*/
+    let price_in_near = convert_sum(price)
+    
+    let span_id = make_id()
+    let element = document.createElement('span')
+    $(element).addClass("greenColor").attr('id', span_id);
+    let el_str = $(element).prop('outerHTML')
 
+    let usd_price = convertNearToUSD(price_in_near, span_id)
+    elem.append( `${price_in_near} ${near_logo} ${el_str}`)
+   
 }
 
-function convertNearToUSD(sum) {
+async function convertNearToUSD(sum, id) {
     loading_near_price_info( (r) => {
-        console.log(r)
-        if (r.near.usd === undefined) {
-            alert("here")
-        }
         if (r.near.usd != undefined) {
             let usd_price = (sum * r.near.usd).toFixed(3)
-            return usd_price
+            $("#"+id).append(`($${usd_price})`)
         }
         else return ""
     })

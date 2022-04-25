@@ -184,12 +184,12 @@ function setNumber(number) {
 }
 
 function setRarity(rarity) {
-    $('#rarityDiv').append(`Редкость - ${set_green_data_elem(rarity)}`);
+    $('#rarityDiv').append(`Редкость - ${create_green_data_elem(rarity)}`);
 }
 
 function setCurrentOwner(currentOwner) {
     console.log(currentOwner)
-    $('#currentOwner').append(`Текущий владелец: ${set_green_data_elem(currentOwner)}`);
+    $('#currentOwner').append(`Текущий владелец: ${create_green_data_elem(currentOwner)}`);
 }
 
 function setFirstOwner(firstOwner) {
@@ -197,7 +197,7 @@ function setFirstOwner(firstOwner) {
 }
 
 function setTotalPrice(totalPrice) {
-    $('#totalpriceDiv').append(`${set_green_data_elem(totalPrice)} ${near_logo}`)
+    $('#totalpriceDiv').append(`${create_green_data_elem(totalPrice)} ${near_logo}`)
 }
 function showMakeDemandButton() {
     $('#makeDemandButtonDiv').append(button("green", "Предложить цену", () => {

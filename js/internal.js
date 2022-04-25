@@ -1,7 +1,15 @@
 let near_price = {};
 
-const set_green_data_elem = (data) => {
-    return `<span class = 'greenColor'>${data}</span>`
+function create_green_data_elem(data ="", id ="") {
+    let element = document.createElement('span')
+    $(element).addClass("greenColor");
+
+    if (data != "") {$(element).html(data)}
+    if (id != "") {$(element).attr("id", id)}
+
+    return  $(element).prop('outerHTML')
+
+    //return `<span id = ${id} class = 'greenColor'>${data}</span>`;
 }
 const set_red_data_elem = (data) => {
     return `<span class = 'redColor'>${data}</span>`
@@ -13,6 +21,7 @@ function number_from_scientific_notation(number) {
 }
 
 function add_table_tr_to (table, first_td_content, second_td_content, buttonText = "", buttonHandler = () => { }) {
+    console.log(second_td_content)
     let elem = `<tr>
                         <td>${first_td_content}</td>
                         <td>${second_td_content}</td>
@@ -52,13 +61,16 @@ function getCookie(cname) {
 }
 
 const price_elem = (price) => {
+    let id = make_id()
+    let element = document.createElement('span')
+    $(element).addClass("greenColor").attr('id', id).html("<b>"+price+"</b>");
 
-    convertNearToUSD(price).then(
-        dollar_price => {
-            console.log(dollar_price)
-            return `${set_green_data_elem("<b>"+price+"</b>" + "($"+dollar_price+")")}`
-        }
-    )
-    
-    //return `${set_green_data_elem("<b>"+price+"</b>" + "($"+convertNearToUSD(price)+")")}`
+    convertNearToUSD(price, id)
+
+    return $(element).prop('outerHTML');
+}
+
+function make_id() {
+    var id = "id" + Math.random().toString(16).slice(2)
+    return id
 }
