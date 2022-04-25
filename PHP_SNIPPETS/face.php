@@ -1,5 +1,3 @@
-<?require_once("popUp.php")?>
-
 <script src="/js/Page_Scripts/faceScript.js"></script>
 
 <div class="preloader">
@@ -72,13 +70,13 @@
         </div>
     </div>
 </div>
-<div class = "container" id="demandsData" style=" margin-top: 30px; ">
-    <div class = "row">
+<div class="container" id="demandsData" style=" margin-top: 30px; ">
+    <div class="row">
         <div class="col-12">
             <h3>Список предложений</h3>
         </div>
     </div>
-    <div class = "row" style=" margin-top: 30px; ">
+    <div class="row" style=" margin-top: 30px; ">
         <div class="col-12">
             <h4>Предложения о продаже</h4>
         </div>
@@ -94,10 +92,13 @@
             </tbody>
         </table>
     </div>
-    <div id="controlOfferPanel" style = "display: none"> Click</div>
-    <div class = "row">
+    <div id="controlOfferPanel" style="display: none" class="row">
+        <div class="col-4"> <label for="nearOfferValueInput"><b>Введите предложение о продаже в yoctoNear:</b></label></div>
+        <div class="col-4"> <input id="nearOfferValueInput" name="nearOfferValueInput" type="number" min="0"></div>
+    </div>
+    <div class="row"  style=" margin-top: 60px; ">
         <div class="col-12">
-        <h4> Предложения о покупке<h4>
+            <h4> Предложения о покупке<h4>
         </div>
         <table class="table" id="demandTable">
             <thead>
@@ -111,8 +112,9 @@
             </tbody>
         </table>
     </div>
-    <div id="controlDemandPanel">
-
+    <div id="controlDemandPanel" class="row">
+        <div class="col-4"> <label for="nearDemandValueInput"><b>Введите предложение о покупке в yoctoNear:</b></label></div>
+        <div class="col-4"> <input id="nearDemandValueInput" name="nearDemandValueInput" type="number" min="0"></div>
     </div>
 </div>
 

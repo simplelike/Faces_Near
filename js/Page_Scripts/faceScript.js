@@ -63,7 +63,7 @@ function setOwnerInfoContentDiv() {
             }
         }))
     }
-    
+
     function setOwnerInfoContentDivForOwnersToken() {
         getOwnerOfToken(id).then(
             owner => {
@@ -78,7 +78,7 @@ function setOwnerInfoContentDiv() {
 
 
 function setListOfOffers() {
-    
+
     getOfferForTokenId(id).then(
         offer => {
             setOffersForTokenIdTable(offer)
@@ -107,6 +107,18 @@ function setListOfOffers() {
             res => {
                 if (res === logged_user) {
                     $("#controlOfferPanel").show()
+                    $("#controlOfferPanel").append(button(
+                        "green",
+                        "Сделать предложение",
+                        function () {
+                            if ($("#nearOfferValueInput").val() !== "") {
+                                makeOffer(id, $("#nearOfferValueInput").val()).then(
+                                    result => { alert("wow") },
+                                    error => { console.log(error)}
+                                )
+                            }
+                        },
+                        "class:btn open-popup#attr:data-id=popup_default"))
                 }
             }
         )
@@ -135,21 +147,23 @@ function setListOfDemands() {
                 let price_el = price_elem(price)
                 add_table_tr_to(table, buyer, price_el)
             }
-    
+
         }
     }
 
     function fillControlPanelOfDemandsData() {
         if (wallet.isSignedIn()) {
-            $("#controlDemandPanel").append(button("green", "Сделать предложение", () => {openPopup( () => {
-                $("#popUpTitle").text("Сделать предложение по покупке токена")
-                $("#popUpData").text("Предложение по покупке токена выставляется по следующим правилам:")
-                $("#submitButton").click( function() {
-                    makeDemandForBuyingToken(id, $("#nearValueInput").val()).then(
-                        result => { alert("wow")}
-                    )
-                })
-            })},"class:btn open-popup#attr:data-id=popup_default"))
+            $("#controlDemandPanel").append(button(
+                "green",
+                "Сделать предложение",
+                function () {
+                    if ($("#nearDemandValueInput").val() !== "") {
+                        makeDemandForBuyingToken(id, $("#nearDemandValueInput").val()).then(
+                            result => { alert("wow") }
+                        )
+                    }
+                },
+                "class:btn open-popup#attr:data-id=popup_default"))
         }
     }
 
