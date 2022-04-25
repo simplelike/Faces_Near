@@ -278,3 +278,17 @@ async function nftGetTokenForFree(token_id) {
         reject("error")
     })
 }
+
+async function makeDemandForBuyingToken(token_id, deposit) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.make_demand_for_buying_token(
+            {
+                token_id: token_id,
+            },
+            "300000000000000",
+            deposit
+            )
+        resolve(_result)
+        reject("error")
+    })
+}

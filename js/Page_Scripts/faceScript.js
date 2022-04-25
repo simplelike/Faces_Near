@@ -9,30 +9,6 @@ let number = parseInt(id) + 1
 
 localForageHandler(_start)
 
-const button = (color, text, handler) => {
-    let color_class;
-    switch (color) {
-        case "red":
-            color_class = "red"    
-        break
-        case "green":
-            color_class = "green" 
-            break
-        default:
-            color_class = "yellow" 
-            break;
-
-    }
-    let button = document.createElement('button')
-    $(button).addClass(color_class)
-            .text(text).click(
-                () => {
-                    handler()
-                }
-            )
-    return button
-}
-
 function _start(v) {
     data = v[id]
     setImageToDiv("/previewData/maxPreview/" + number + ".png", data.g_h)
@@ -40,18 +16,6 @@ function _start(v) {
     setNumber(data.nbr)
     setRarity(data.rrt)
     setOwnerInfoContentDiv()
-
-    setListOfOffers()
-    //setListOfDemands()
-
-
-    /*setDemandsInfoContentTable()
-
-    getInfoOfDemandsForToken(id).then(
-        result => {
-            setDemandsInfoContentTable(result)
-        }
-    )*/
 
     setContentForAttrComponent("jeweleryAttrComponent", "Украшение", data.j_a.t_c, data.j_a.T)
     setContentForAttrComponent("backgroundAttrComponent", "Фон", data.b_a.t_c, data.b_a.T)
@@ -63,12 +27,16 @@ function _start(v) {
     setContentForAttrComponent("faceAttrComponent", "Лицо", data.f_a.t_c, data.f_a.T)
 
     $('.preloader').fadeOut().end().delay(400).fadeOut('slow')
+
+    setListOfOffers()
+    setListOfDemands()
 }
 
 function setOwnerInfoContentDiv() {
+
     doesTokenBelongsToContractAcc(id).then(
         r => {
-            switch(r) {
+            switch (r) {
                 case true: {
                     setOwnerInfoContentDivForNoOnesToken()
                     break
@@ -80,50 +48,41 @@ function setOwnerInfoContentDiv() {
             }
         }
     )
-}
 
-function setOwnerInfoContentDivForNoOnesToken() {
-    //$("#ownerInfoContent").html("")
-    $("#noOnesTokenInfo").append(button("green", "Станьте первым владельцем токена", () => {
-        if (wallet.isSignedIn()) {
-            nftGetTokenForFree(id).then(
-                result => {
-                    console.log(result)
-                }
-            )
-        }
-        else {
-            signIn()
-        }
-    }))
-}
-
-function setOwnerInfoContentDivForOwnersToken() {
-    getOwnerOfToken(id).then(
-        result => {
-            setCurrentOwner(result)
-        },
-        error => console.log("err")
-    )
-
-    setFirstOwner("Получить из контракта")
+    function setOwnerInfoContentDivForNoOnesToken() {
+        $("#noOnesTokenInfo").append(button("green", "Станьте первым владельцем токена", () => {
+            if (wallet.isSignedIn()) {
+                nftGetTokenForFree(id).then(
+                    result => {
+                        console.log(result)
+                    }
+                )
+            }
+            else {
+                signIn()
+            }
+        }))
+    }
     
-    /*getOfferForTokenId(id).then(
-        result => {
-            let price = result == null ? "Пока нет предложений о продаже" : nearApi.utils.format.formatNearAmount(number_from_scientific_notation(result.price))
-            setTotalPrice(price)
-            // if (result.sailer !== logged_user) {
-            //     showMakeDemandButton()
-            // }
-        },
-        error => console.log(error)
-    )*/
+    function setOwnerInfoContentDivForOwnersToken() {
+        getOwnerOfToken(id).then(
+            owner => {
+                setCurrentOwner(owner)
+            },
+            error => console.log("err")
+        )
+        setFirstOwner("Получить из контракта")
+    }
 }
+
+
 
 function setListOfOffers() {
+    
     getOfferForTokenId(id).then(
         offer => {
             setOffersForTokenIdTable(offer)
+            fillControlPanelOfOfferData()
         },
         error => {
             console.log(error)
@@ -142,16 +101,56 @@ function setListOfOffers() {
             add_table_tr_to(table, sailer, price_el)
         }
     }
+
+    function fillControlPanelOfOfferData() {
+        getOwnerOfToken(id).then(
+            res => {
+                if (res === logged_user) {
+                    $("#controlOfferPanel").show()
+                }
+            }
+        )
+    }
 }
 
-function setDemandsInfoContentTable(data) {
-    let tr = ""
-    if (data === null || data === undefined || data === "") return
+function setListOfDemands() {
+    getInfoOfDemandsForToken(id).then(
+        demands => {
+            console.log(demands)
+            setDemandsInfoContentTable(demands)
+            fillControlPanelOfDemandsData()
+        }
+    )
 
-    $("#demandsData").attr("display", "block");
-    for (let [_, element] of data.entries()) {
-        let tr = `<tr><td>${element.buyer_acc}</td><td>${convert_sum(element.price)}</td><td>Кнопка</td></tr>`
-        $("#tableOfDemandsOnToken tbody").append(tr)
+    function setDemandsInfoContentTable(demands) {
+
+        let table = $("#demandTable tbody")
+        if (isEmpty(demands)) {
+            add_table_tr_to(table, "Пока нет предложений", "-")
+        }
+        else {
+            for (let [_, element] of demands.entries()) {
+                let buyer = element.buyer_acc
+                let price = convert_sum(element.price)
+                let price_el = price_elem(price)
+                add_table_tr_to(table, buyer, price_el)
+            }
+    
+        }
+    }
+
+    function fillControlPanelOfDemandsData() {
+        if (wallet.isSignedIn()) {
+            $("#controlDemandPanel").append(button("green", "Сделать предложение", () => {openPopup( () => {
+                $("#popUpTitle").text("Сделать предложение по покупке токена")
+                $("#popUpData").text("Предложение по покупке токена выставляется по следующим правилам:")
+                $("#submitButton").click( function() {
+                    makeDemandForBuyingToken(id, $("#nearValueInput").val()).then(
+                        result => { alert("wow")}
+                    )
+                })
+            })},"class:btn open-popup#attr:data-id=popup_default"))
+        }
     }
 
 }
@@ -161,18 +160,18 @@ function setContentForAttrComponent(id, title, count, choosenElementTitle) {
     //let titleForInput = value[0].replace(".png", "")
     element.append(
         `<div class = "row" class = "padding">
-                    <div class = "col typeStyle">
-                        ${title.replace(".png", "")}
-                    </div>
-                    <div class = "col componentTitle">
-                       ${count.replace(".png", "")} Супремов
-                    </div>
-            </div>
-            <div class="row">
-                <div class="col totalCountStr">
-                    ${choosenElementTitle.replace(".png", "")}
+                <div class = "col typeStyle">
+                    ${title.replace(".png", "")}
                 </div>
-            </div>`
+                <div class = "col componentTitle">
+                   ${count.replace(".png", "")} Супремов
+                </div>
+        </div>
+        <div class="row">
+            <div class="col totalCountStr">
+                ${choosenElementTitle.replace(".png", "")}
+            </div>
+        </div>`
     )
 }
 const make_demand_button = () => {
@@ -226,4 +225,3 @@ function tooggleDemandInputView() {
     }
     $('#makeDemandInput').toggle();
 }
-

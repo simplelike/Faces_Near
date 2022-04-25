@@ -37,27 +37,50 @@ function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    let expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
+const button = (color, text, handler = () => {}, additionalData = "") => {
+    let color_class;
+    switch (color) {
+        case "red":
+            color_class = "red"
+            break
+        case "green":
+            color_class = "green"
+            break
+        default:
+            color_class = "yellow"
+            break;
 
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
     }
-    return "";
+    let button = document.createElement('button')
+    $(button).addClass(color_class)
+    $(button).text(text)
+    if (handler != "") {
+        $(button).click(
+            () => {
+                handler()
+            }
+        )
+    }
+    if (additionalData != "") {
+        let args = additionalData.split("#");
+        for (let [_, element] of args.entries()) {
+            let elem = element.split(":");
+            if (!isEmpty(elem)) {
+                switch (elem[0]) {
+                    case "class":
+                        $(button).addClass(elem[1])
+                    break
+                    case "attr":
+                        let attr_arr = elem[1].split("=")
+                        $(button).attr(attr_arr[0], attr_arr[1])
+                        break
+                    default:
+                        break
+                }
+            }
+        }
+    }
+    return button
 }
 
 const price_elem = (price) => {

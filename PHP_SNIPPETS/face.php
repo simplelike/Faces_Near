@@ -1,3 +1,5 @@
+<?require_once("popUp.php")?>
+
 <script src="/js/Page_Scripts/faceScript.js"></script>
 
 <div class="preloader">
@@ -92,11 +94,12 @@
             </tbody>
         </table>
     </div>
+    <div id="controlOfferPanel" style = "display: none"> Click</div>
     <div class = "row">
         <div class="col-12">
         <h4> Предложения о покупке<h4>
         </div>
-        <table class="table" id="offerTable">
+        <table class="table" id="demandTable">
             <thead>
                 <tr>
                     <td class="littleTitle">Аккаунт</td>
@@ -108,8 +111,10 @@
             </tbody>
         </table>
     </div>
-</div>
+    <div id="controlDemandPanel">
 
+    </div>
+</div>
 
 <!--div class="container-fluid marginContent containerFluidPadding" style=" margin-top: 60px; ">
     <div class="row">
