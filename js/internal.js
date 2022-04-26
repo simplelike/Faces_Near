@@ -51,14 +51,11 @@ function add_table_tr_to(table, first_td_content = "", second_td_content = "", b
             }
         }
         let td = document.createElement('td')
-        let _button = button(color, title, () => {
-            alert("here")
-        })
-        $(td).append(_button)
-        $(element).append(`<td>${_button}</td>`)
-        console.log(element)
+        let _button = button(color, title, buttonHandler)
+        $(td).html(_button)
+        $(element).append(td)
     }
-    table.append($(element).prop('outerHTML'))
+    table.append(element)
     //return  $(element).prop('outerHTML')
 }
 
@@ -88,6 +85,7 @@ const button = (color, text, handler = () => { }, additionalData = "") => {
     $(button).addClass(color_class)
     $(button).text(text)
     if (handler != "") {
+        console.log(handler)
         $(button).click(
             () => {
                 handler()

@@ -172,7 +172,7 @@ function setListOfDemands() {
                 if (!areUserOwnerOfToken) {
                     if (wallet.getAccountId() === buyer) {
                         add_table_tr_to(table, buyer, price_el, "owner:self", function() {
-                            alert("here")
+                            alert("here1111")
                         })
                     }
                     else {
