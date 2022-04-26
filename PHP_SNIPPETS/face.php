@@ -82,11 +82,11 @@
         </div>
         <table class="table" id="offerTable">
             <thead>
-                <tr>
+                <th>
                     <td class="littleTitle">Аккаунт</td>
                     <td class="littleTitle">Стоимость</td>
                     <td class="littleTitle"></td>
-                </tr>
+                </th>
             </thead>
             <tbody>
             </tbody>
@@ -102,17 +102,17 @@
         </div>
         <table class="table" id="demandTable">
             <thead>
-                <tr>
+                <th>
                     <td class="littleTitle">Аккаунт</td>
                     <td class="littleTitle">Стоимость</td>
                     <td class="littleTitle"></td>
-                </tr>
+                </th>
             </thead>
             <tbody>
             </tbody>
         </table>
     </div>
-    <div id="controlDemandPanel" class="row">
+    <div id="controlDemandPanel" style="display: none" class="row">
         <div class="col-4"> <label for="nearDemandValueInput"><b>Введите предложение о покупке в yoctoNear:</b></label></div>
         <div class="col-4"> <input id="nearDemandValueInput" name="nearDemandValueInput" type="number" min="0"></div>
     </div>

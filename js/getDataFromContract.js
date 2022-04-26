@@ -295,9 +295,8 @@ async function makeDemandForBuyingToken(token_id, deposit) {
 
 async function makeOffer(token_id, deposit) {
     let dep = {
-        price: nearApi.utils.format.formatNearAmount(deposit)
+        price: deposit
     }
-    console.log(dep)
     return new Promise((resolve, reject) => {
         let _result = contract.nft_approve(
             {
@@ -306,7 +305,7 @@ async function makeOffer(token_id, deposit) {
                 msg: JSON.stringify(dep)
             },
             "300000000000000",
-            1   
+            "300000000000000000000"
         )
         resolve(_result)
         reject("error")

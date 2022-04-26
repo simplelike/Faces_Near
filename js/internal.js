@@ -1,13 +1,13 @@
 let near_price = {};
 
-function create_green_data_elem(data ="", id ="") {
+function create_green_data_elem(data = "", id = "") {
     let element = document.createElement('span')
     $(element).addClass("greenColor");
 
-    if (data != "") {$(element).html(data)}
-    if (id != "") {$(element).attr("id", id)}
+    if (data != "") { $(element).html(data) }
+    if (id != "") { $(element).attr("id", id) }
 
-    return  $(element).prop('outerHTML')
+    return $(element).prop('outerHTML')
 
     //return `<span id = ${id} class = 'greenColor'>${data}</span>`;
 }
@@ -20,13 +20,46 @@ function number_from_scientific_notation(number) {
     return number.toLocaleString('fullwide', { useGrouping: false })
 }
 
-function add_table_tr_to (table, first_td_content, second_td_content, buttonText = "", buttonHandler = () => { }) {
-    console.log(second_td_content)
-    let elem = `<tr>
-                        <td>${first_td_content}</td>
-                        <td>${second_td_content}</td>
-                    </tr>`;
-    table.append(elem);
+function add_table_tr_to(table, first_td_content = "", second_td_content = "", btnCfg = "", buttonHandler = () => { }) {
+
+    let element = document.createElement('tr')
+    if (first_td_content !== "") { $(element).append(`<td>${first_td_content}</td>`) }
+    if (second_td_content !== "") { $(element).append(`<td>${second_td_content}</td>`) }
+    if (btnCfg !== "") {
+        let params = btnCfg.split("#")
+        let color = ""
+        let title = ""
+        for (let [_, element] of params.entries()) {
+            let elem = element.split(":");
+            if (!isEmpty(elem)) {
+                switch (elem[0]) {
+                    case "color":
+                        color = elem[1]
+                        break
+                    case "title": 
+                        title = elem[1]
+                        break
+                    case "owner":
+                        if (elem[1] === "self") {
+                            color = "red"
+                            title = "Удалить"
+                        }
+                        break
+                    default:
+                        break
+                }
+            }
+        }
+        let td = document.createElement('td')
+        let _button = button(color, title, () => {
+            alert("here")
+        })
+        $(td).append(_button)
+        $(element).append(`<td>${_button}</td>`)
+        console.log(element)
+    }
+    table.append($(element).prop('outerHTML'))
+    //return  $(element).prop('outerHTML')
 }
 
 function convert_sum(sum) {
@@ -37,7 +70,7 @@ function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-const button = (color, text, handler = () => {}, additionalData = "") => {
+const button = (color, text, handler = () => { }, additionalData = "") => {
     let color_class;
     switch (color) {
         case "red":
@@ -69,11 +102,12 @@ const button = (color, text, handler = () => {}, additionalData = "") => {
                 switch (elem[0]) {
                     case "class":
                         $(button).addClass(elem[1])
-                    break
+                        break
                     case "attr":
                         let attr_arr = elem[1].split("=")
                         $(button).attr(attr_arr[0], attr_arr[1])
                         break
+                    
                     default:
                         break
                 }
@@ -86,7 +120,7 @@ const button = (color, text, handler = () => {}, additionalData = "") => {
 const price_elem = (price) => {
     let id = make_id()
     let element = document.createElement('span')
-    $(element).addClass("greenColor").attr('id', id).html("<b>"+price+"</b>");
+    $(element).addClass("greenColor").attr('id', id).html("<b>" + price + "</b>");
 
     convertNearToUSD(price, id)
 

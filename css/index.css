@@ -328,4 +328,9 @@ button.red {
 button.yellow {
     background: #ffee58;
 }
-
+table tbody tr {
+    transition: 0.3s;
+}
+table tbody tr:hover {
+    background: #e1e1e1;
+}

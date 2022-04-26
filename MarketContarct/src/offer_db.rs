@@ -11,8 +11,8 @@ impl Contract {
             .price
             .parse()
             .expect("nft_on_approve::Error in price setting");
-        let new_price = convert_to_yocto(n_p);
-
+        //let new_price = convert_to_yocto(n_p);
+        let new_price = n_p;
         let sailer = env::signer_account_id();
         //Формируем новое предложение о продаже
         let new_sail_announcement: Announcement = Announcement {

@@ -129,12 +129,36 @@ function setListOfDemands() {
     getInfoOfDemandsForToken(id).then(
         demands => {
             console.log(demands)
-            setDemandsInfoContentTable(demands)
-            fillControlPanelOfDemandsData()
+            fillControlPanelOfDemandsData(demands)
         }
     )
 
-    function setDemandsInfoContentTable(demands) {
+    function fillControlPanelOfDemandsData(demands) {
+        if (wallet.isSignedIn()) {
+            getOwnerOfToken(id).then(
+                res => {
+                    if (res != logged_user) {
+                        $("#controlDemandPanel").show()
+                        $("#controlDemandPanel").append(button(
+                            "green",
+                            "Сделать предложение",
+                            function () {
+                                if ($("#nearDemandValueInput").val() !== "") {
+                                    makeDemandForBuyingToken(id, $("#nearDemandValueInput").val()).then(
+                                        result => { alert("wow") }
+                                    )
+                                }
+                            },
+                            "class:btn open-popup#attr:data-id=popup_default"))
+                        
+                        setDemandsInfoContentTable(demands, false)
+                    }
+                }
+            )  
+        }
+    }
+
+    function setDemandsInfoContentTable(demands, areUserOwnerOfToken = false) {
 
         let table = $("#demandTable tbody")
         if (isEmpty(demands)) {
@@ -145,28 +169,20 @@ function setListOfDemands() {
                 let buyer = element.buyer_acc
                 let price = convert_sum(element.price)
                 let price_el = price_elem(price)
-                add_table_tr_to(table, buyer, price_el)
+                if (!areUserOwnerOfToken) {
+                    if (wallet.getAccountId() === buyer) {
+                        add_table_tr_to(table, buyer, price_el, "owner:self", function() {
+                            alert("here")
+                        })
+                    }
+                    else {
+                        add_table_tr_to(table, buyer, price_el, "color:green#title:Ответить")
+                    }
+                }
             }
 
         }
     }
-
-    function fillControlPanelOfDemandsData() {
-        if (wallet.isSignedIn()) {
-            $("#controlDemandPanel").append(button(
-                "green",
-                "Сделать предложение",
-                function () {
-                    if ($("#nearDemandValueInput").val() !== "") {
-                        makeDemandForBuyingToken(id, $("#nearDemandValueInput").val()).then(
-                            result => { alert("wow") }
-                        )
-                    }
-                },
-                "class:btn open-popup#attr:data-id=popup_default"))
-        }
-    }
-
 }
 
 function setContentForAttrComponent(id, title, count, choosenElementTitle) {
