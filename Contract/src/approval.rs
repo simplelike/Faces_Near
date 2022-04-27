@@ -33,6 +33,13 @@ trait NonFungibleTokenApprovalsReceiver {
         approval_id: u64,
         msg: String,
     );
+
+    fn take_off_sale(
+        &mut self,
+        token_id: TokenId,
+        approval_id: u64,
+        remover: AccountId,
+    );
 }
 
 #[near_bindgen]
@@ -141,13 +148,25 @@ impl NonFungibleTokenCore for Contract {
         assert_eq!(&predecessor_account_id, &token.owner_id);
 
         //if the account ID was in the token's approval, we remove it and the if statement logic executes
-        if token.approved_account_ids.remove(&account_id).is_some() {
+        if let Some(approval_id) = token.approved_account_ids.remove(&account_id) {
             //refund the funds released by removing the approved_account_id to the caller of the function
             refund_approved_account_ids_iter(predecessor_account_id, [account_id].iter());
 
             //insert the token back into the tokens_by_id collection with the account_id removed from the approval list
             self.tokens_by_id.insert(&token_id, &token);
+
+            ext_non_fungible_approval_receiver::take_off_sale(
+            token_id,
+            approval_id.clone(),
+            token.owner_id,
+            MARKET_ACCOUNT_ID.parse().unwrap(),                               //contract account we're calling
+            NO_DEPOSIT,                               //NEAR deposit we attach to the call
+            env::prepaid_gas() - GAS_FOR_NFT_APPROVE, //GAS we're attaching
+        )
+        .as_return(); // Returning this promise
         }
+
+        
     }
 
     #[payable]
@@ -186,7 +205,7 @@ impl Contract {
         return false
     }
     
-    #[payable]
+    /*#[payable]
     pub fn nft_get_token_for_free(&mut self, token_id: &TokenId) -> bool {
         assert_one_yocto();
         let buyer = env::signer_account_id();
@@ -199,6 +218,6 @@ impl Contract {
         }
         env::log_str("The token belongs to someone");
         return false
-    }
+    }*/
 }
 

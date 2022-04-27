@@ -2,7 +2,7 @@ use crate::*;
 
 pub const GAS_FOR_COMMON_OPERATIONS: Gas = Gas(30_000_000_000_000);
 pub const GAS_RESERVED_FOR_CURRENT_CALL: Gas = Gas(20_000_000_000_000);
-pub const NFT_ACC: &str = "fg10.testnet";
+pub const NFT_ACC: &str = "supremes_nft.testnet";
 
 
 #[ext_contract(ext_self)]

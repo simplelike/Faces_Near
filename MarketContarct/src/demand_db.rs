@@ -46,6 +46,7 @@ impl Contract {
             buyer_acc: buyer.clone(),
             price: price,
             token_id: token_id.clone(),
+            demand_id: self.demand_id.clone()
         };
 
         self.demand.insert(&self.demand_id, &new_demand);

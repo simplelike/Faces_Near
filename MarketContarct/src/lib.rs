@@ -48,8 +48,8 @@ pub struct Announcement {
 pub struct DemandForNftToken {
     pub buyer_acc: AccountId,
     pub price: Balance,
-
     pub token_id: TokenId,
+    pub demand_id: DemandId
 }
 
 #[near_bindgen]

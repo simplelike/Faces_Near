@@ -23,5 +23,4 @@
     <script src="/js/getDataFromContract.js"></script>
     <script src="/js/getNearValue.js"></script>
     <script src="/js/internal.js"></script>
-    <script src="/js/popUp.js"></script>
 </head>

@@ -1,4 +1,4 @@
-const contract_id = 'fg10.testnet'
+const contract_id = 'supremes_nft.testnet'
 
 const market_contract = "market.fg6.testnet"
 
@@ -26,7 +26,14 @@ const contract = new nearApi.Contract(wallet.account(), contract_id, {
                   'get_link_to_data',
                   'get_hash_of_data',],
 
-    changeMethods: ['nft_batch_mint', 'make_demand_for_buying_token', 'nft_get_token_for_free', 'remove_demand_for_buying_token', 'nft_approve'],
+    changeMethods:  ['nft_batch_mint',
+                    'nft_mint',
+                    'make_demand_for_buying_token',
+                    'nft_get_token_for_free',
+                    'remove_demand_for_buying_token',
+                    'nft_approve',
+                    'nft_revoke'
+                    ],
 });
 
 $(window).load(function () {
@@ -62,7 +69,14 @@ const logged_user = wallet.getAccountId()
 function signIn() {
     wallet.requestSignIn({
         contractId: contract_id,
-        methodNames: ['nft_batch_mint', 'make_demand_for_buying_token', 'nft_get_token_for_free', 'remove_demand_for_buying_token', 'nft_approve']
+        methodNames: 
+        ['nft_batch_mint',
+        'nft_mint',
+        'make_demand_for_buying_token',
+        'nft_get_token_for_free',
+        'remove_demand_for_buying_token',
+        'nft_approve',
+        'nft_revoke']
     });
 }
 

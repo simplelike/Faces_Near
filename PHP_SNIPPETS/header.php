@@ -24,9 +24,9 @@
             <li class="nav-item">
                 <a class="nav-link" id="signInButton" href="#"></a>
             </li>
-            <li class="nav-item">
+            <!--li class="nav-item">
                 <a class="nav-link" id="signInButton" onclick="contractMethodEval();" href="#">Тест </a>
-            </li>
+            </li-->
         </ul>
     </div>
 </nav>

@@ -120,6 +120,7 @@ impl Contract {
                     buyer_acc: self.demand.get(&demand_id).unwrap().buyer_acc,
                     price: self.demand.get(&demand_id).unwrap().price,
                     token_id: self.demand.get(&demand_id).unwrap().token_id,
+                    demand_id:  self.demand.get(&demand_id).unwrap().demand_id,
                 };
                 return_value.push(demand);
             }

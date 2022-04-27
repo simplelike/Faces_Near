@@ -1,5 +1,7 @@
 <script src="/js/Page_Scripts/faceScript.js"></script>
 
+<?require_once("errorSnippet.php")?>
+
 <div class="preloader">
     <div class="preloader__image"></div>
 </div>
@@ -82,11 +84,11 @@
         </div>
         <table class="table" id="offerTable">
             <thead>
-                <th>
-                    <td class="littleTitle">Аккаунт</td>
-                    <td class="littleTitle">Стоимость</td>
-                    <td class="littleTitle"></td>
-                </th>
+                <tr>
+                    <th class="littleTitle">Аккаунт</th>
+                    <th class="littleTitle">Стоимость</th>
+                    <th class="littleTitle"></th>
+                </tr>
             </thead>
             <tbody>
             </tbody>
@@ -102,11 +104,11 @@
         </div>
         <table class="table" id="demandTable">
             <thead>
-                <th>
-                    <td class="littleTitle">Аккаунт</td>
-                    <td class="littleTitle">Стоимость</td>
-                    <td class="littleTitle"></td>
-                </th>
+                <tr>
+                    <th class="littleTitle">Аккаунт</th>
+                    <th class="littleTitle">Стоимость</th>
+                    <th class="littleTitle"></th>
+                </tr>
             </thead>
             <tbody>
             </tbody>

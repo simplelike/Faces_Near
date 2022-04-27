@@ -1,7 +1,6 @@
 use crate::*;
 use near_sdk::{ext_contract, Gas};
 
-pub const MARKET_ACCOUNT_ID: &str = "market.fg6.testnet";
 pub const GAS_RESERVED_FOR_CURRENT_CALL: Gas = Gas(20_000_000_000_000);
 
 #[ext_contract(ext_market)]
@@ -48,4 +47,12 @@ impl Contract {
             CALL_GAS
         );
     }
+
+    pub fn get(&self, token_id: &TokenId) -> Option<AccountId> {
+        if let Some(r) = self.tokens_by_id.get(&token_id) {
+            return Some(r.owner_id)
+        }
+        None
+    }
 }
+

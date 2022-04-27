@@ -311,3 +311,48 @@ async function makeOffer(token_id, deposit) {
         reject("error")
     })
 }
+
+async function remove_demand_id(demand_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.remove_demand_for_buying_token(
+            {
+                demand_id: demand_id,
+            },
+            "300000000000000",
+            "100000000000000000000"
+        )
+        resolve(_result)
+        reject("error")
+    })
+}
+
+async function remove_offer_id_for(token_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.nft_revoke(
+            {
+                token_id: token_id,
+                account_id: market_contract
+            },
+            "300000000000000",
+            "1"
+        )
+        resolve(_result)
+        reject("error")
+    })
+}
+
+async function nftMint(token_id, metadata, receiver_id) {
+    return new Promise((resolve, reject) => {
+        let _result = contract.nft_mint(
+            {
+                token_id: token_id,
+                metadata: metadata,
+                receiver_id: receiver_id
+            },
+            "300000000000000",
+            "9000000000000000000000",
+        )
+        resolve(_result)
+        reject("error")
+    })
+}

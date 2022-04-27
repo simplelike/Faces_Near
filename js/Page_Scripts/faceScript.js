@@ -34,27 +34,38 @@ function _start(v) {
 
 function setOwnerInfoContentDiv() {
 
-    doesTokenBelongsToContractAcc(id).then(
-        r => {
-            switch (r) {
-                case true: {
-                    setOwnerInfoContentDivForNoOnesToken()
-                    break
-                }
-                default: {
-                    setOwnerInfoContentDivForOwnersToken()
-                    break
-                }
+    getOwnerOfToken(id).then(
+        owner => {
+            if (owner !== null) {
+                setCurrentOwner(owner)
+                setFirstOwner("Получить из контракта")
             }
+            else {
+                setOwnerInfoContentDivForNoOnesToken()
+            }
+        },
+        error => {
+            showErrorMessage(error)
         }
     )
 
     function setOwnerInfoContentDivForNoOnesToken() {
         $("#noOnesTokenInfo").append(button("green", "Станьте первым владельцем токена", () => {
             if (wallet.isSignedIn()) {
-                nftGetTokenForFree(id).then(
+                let element = localDump[id]
+                nftMint(
+                    id,
+                    {
+                        title: element["T"],
+                        media: element["g_h"]
+                    },
+                    wallet.getAccountId()
+                ).then(
                     result => {
                         console.log(result)
+                    },
+                    error => {
+                        showErrorMessage(error)
                     }
                 )
             }
@@ -63,49 +74,27 @@ function setOwnerInfoContentDiv() {
             }
         }))
     }
-
-    function setOwnerInfoContentDivForOwnersToken() {
-        getOwnerOfToken(id).then(
-            owner => {
-                setCurrentOwner(owner)
-            },
-            error => console.log("err")
-        )
-        setFirstOwner("Получить из контракта")
-    }
 }
-
-
 
 function setListOfOffers() {
 
     getOfferForTokenId(id).then(
         offer => {
-            setOffersForTokenIdTable(offer)
-            fillControlPanelOfOfferData()
+            console.log(offer)
+            fillOffersDataWith(offer)
         },
         error => {
-            console.log(error)
+            showErrorMessage(error)
         }
     )
 
-    function setOffersForTokenIdTable(offer) {
-        let table = $("#offerTable tbody")
-        if (offer === null) {
-            add_table_tr_to(table, "Пока нет предложений", "-")
-        }
-        else {
-            let sailer = offer.sailer
-            let price = convert_sum(offer.price)
-            let price_el = price_elem(price)
-            add_table_tr_to(table, sailer, price_el)
-        }
-    }
-
-    function fillControlPanelOfOfferData() {
+    function fillOffersDataWith(offer) {
         getOwnerOfToken(id).then(
             res => {
                 if (res === logged_user) {
+
+                    setOffersForTokenIdTable(offer, true)
+
                     $("#controlOfferPanel").show()
                     $("#controlOfferPanel").append(button(
                         "green",
@@ -113,31 +102,79 @@ function setListOfOffers() {
                         function () {
                             if ($("#nearOfferValueInput").val() !== "") {
                                 makeOffer(id, $("#nearOfferValueInput").val()).then(
-                                    result => { alert("wow") },
-                                    error => { console.log(error)}
+                                    error => {
+                                        showErrorMessage(error)
+                                    }
                                 )
                             }
-                        },
-                        "class:btn open-popup#attr:data-id=popup_default"))
+                        }))
                 }
+                else {
+                    setOffersForTokenIdTable(offer, false)
+                    $("#controlOfferPanel").hide()
+                }
+            },
+            error => {
+                showErrorMessage(error)
             }
         )
+    }
+
+    function setOffersForTokenIdTable(offer, areUserOwnerOfToken = false) {
+        let table = $("#offerTable tbody")
+        if (offer === null) {
+            add_table_tr_to(table, ["Пока нет предложений", "-"])
+        }
+        else {
+
+            let sailer = offer.sailer
+            let price = convert_sum(offer.price)
+            let price_el = price_elem(price)
+            let _button = ""
+
+            if (wallet.isSignedIn()) {
+                if (areUserOwnerOfToken) {
+                    _button = button("red", "Удалить", () => {
+                        remove_offer_id_for(id).then(
+                            result => { console.log(result) },
+                            error => {
+                                showErrorMessage(error)
+                            }
+                        )
+                    })
+                }
+                else {
+                    _button = button("green", "Принять", () => {
+                        $("#nearDemandValueInput").val(number_from_scientific_notation(element.price))
+                        scrollToAnchor("nearDemandValueInput")
+                    })
+                }
+            }
+            add_table_tr_to(table, [sailer, price_el, _button])
+        }
     }
 }
 
 function setListOfDemands() {
     getInfoOfDemandsForToken(id).then(
         demands => {
-            console.log(demands)
-            fillControlPanelOfDemandsData(demands)
+            fillDemandsDataWith(demands)
+        },
+        error => {
+            showErrorMessage(error)
         }
     )
 
-    function fillControlPanelOfDemandsData(demands) {
-        if (wallet.isSignedIn()) {
-            getOwnerOfToken(id).then(
-                res => {
-                    if (res != logged_user) {
+    function fillDemandsDataWith(demands) {
+        //Получим аккаунт кому принадлежит токен
+        getOwnerOfToken(id).then(
+            res => {
+                //Если токен не принадлежит пользователю, 
+                if (res != logged_user) {
+                    //то настроим вид таблицы с предложениями о покупке, как для потенциального покупателя
+                    setDemandsInfoContentTable(demands, false)
+                    //И можем делать ставки на покупку токена
+                    if (wallet.isSignedIn()) {
                         $("#controlDemandPanel").show()
                         $("#controlDemandPanel").append(button(
                             "green",
@@ -145,40 +182,73 @@ function setListOfDemands() {
                             function () {
                                 if ($("#nearDemandValueInput").val() !== "") {
                                     makeDemandForBuyingToken(id, $("#nearDemandValueInput").val()).then(
-                                        result => { alert("wow") }
+                                        error => {
+                                            showErrorMessage(error)
+                                        }
                                     )
                                 }
-                            },
-                            "class:btn open-popup#attr:data-id=popup_default"))
-                        
-                        setDemandsInfoContentTable(demands, false)
+                            }))
                     }
+
                 }
-            )  
-        }
+                //А если пользователь владелец токена, то он должен иметь возможность принять любой demand
+                //Значит настроим соответствующим образом вид таблицы с предложениями
+                //И скроем возможность делать ставки на покупку
+                else {
+                    setDemandsInfoContentTable(demands, true)
+                    $("#controlDemandPanel").hide()
+                }
+            },
+            error => {
+                showErrorMessage(error)
+            }
+        )
     }
 
     function setDemandsInfoContentTable(demands, areUserOwnerOfToken = false) {
 
         let table = $("#demandTable tbody")
         if (isEmpty(demands)) {
-            add_table_tr_to(table, "Пока нет предложений", "-")
+            add_table_tr_to(table, ["Пока нет предложений", "-"])
         }
         else {
             for (let [_, element] of demands.entries()) {
+                console.log(element)
                 let buyer = element.buyer_acc
                 let price = convert_sum(element.price)
                 let price_el = price_elem(price)
-                if (!areUserOwnerOfToken) {
-                    if (wallet.getAccountId() === buyer) {
-                        add_table_tr_to(table, buyer, price_el, "owner:self", function() {
-                            alert("here1111")
-                        })
+                let _button = ""
+
+                if (wallet.isSignedIn()) {
+                    if (!areUserOwnerOfToken) {
+                        if (wallet.getAccountId() === buyer) {
+                            _button = button("red", "Удалить", () => {
+                                remove_demand_id(element.demand_id).then(
+                                    error => {
+                                        showErrorMessage(error)
+                                    }
+                                )
+                            })
+                        }
+                        else {
+                            _button = button("green", "Ответить", () => {
+                                $("#nearDemandValueInput").val(number_from_scientific_notation(element.price))
+                                scrollToAnchor("nearDemandValueInput")
+                            })
+                        }
                     }
                     else {
-                        add_table_tr_to(table, buyer, price_el, "color:green#title:Ответить")
+                        _button = button("green", "Принять", () => {
+                            let _price = nearApi.utils.format.parseNearAmount(number_from_scientific_notation(price))
+                            makeOffer(id, _price).then(
+                                error => {
+                                    showErrorMessage(error)
+                                }
+                            )
+                        })
                     }
                 }
+                add_table_tr_to(table, [buyer, price_el, _button])
             }
 
         }

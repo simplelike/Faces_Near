@@ -5,7 +5,6 @@ function localForageHandler(f) {
         let forageObjectHash = objectHash.sha1(value);
         //If it's the first loading of page and we havent obj in localforage - need to download it from server
         if (value == null) {
-            alert('first time loaded')
             localForageSync(f)
             return
         }
@@ -15,12 +14,10 @@ function localForageHandler(f) {
                 //if hash of object in dataDump are the same that the hash in contract
                 if (output === forageObjectHash) {
                     //Starting gallery page drawing
-                    alert('already loaded')
                     f(value)
                 }
                 //If they are not the same - starting sync data from ipfs and save it to localForage
                 else {
-                    alert('hashes are: contract:'+ output + " forage: " + forageObjectHash)
                     localForageSync(f)
                 }
             }).catch(function (err) {

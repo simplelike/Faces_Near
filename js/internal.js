@@ -15,48 +15,21 @@ const set_red_data_elem = (data) => {
     return `<span class = 'redColor'>${data}</span>`
 }
 const near_logo = `<img style='width: 50px;' src= '/sources/nearCircleLogo.png'>`
+const sm_near_logo = `<img style='width: 20px;' src= '/sources/nearCircleLogo.png'>`
 
 function number_from_scientific_notation(number) {
     return number.toLocaleString('fullwide', { useGrouping: false })
 }
 
-function add_table_tr_to(table, first_td_content = "", second_td_content = "", btnCfg = "", buttonHandler = () => { }) {
-
-    let element = document.createElement('tr')
-    if (first_td_content !== "") { $(element).append(`<td>${first_td_content}</td>`) }
-    if (second_td_content !== "") { $(element).append(`<td>${second_td_content}</td>`) }
-    if (btnCfg !== "") {
-        let params = btnCfg.split("#")
-        let color = ""
-        let title = ""
-        for (let [_, element] of params.entries()) {
-            let elem = element.split(":");
-            if (!isEmpty(elem)) {
-                switch (elem[0]) {
-                    case "color":
-                        color = elem[1]
-                        break
-                    case "title": 
-                        title = elem[1]
-                        break
-                    case "owner":
-                        if (elem[1] === "self") {
-                            color = "red"
-                            title = "Удалить"
-                        }
-                        break
-                    default:
-                        break
-                }
-            }
-        }
+function add_table_tr_to(table, arrOfTds) {
+    
+    let table_row = document.createElement('tr')
+    for (let [_, element] of arrOfTds.entries()) {
         let td = document.createElement('td')
-        let _button = button(color, title, buttonHandler)
-        $(td).html(_button)
-        $(element).append(td)
-    }
-    table.append(element)
-    //return  $(element).prop('outerHTML')
+        $(td).html(element)
+        $(table_row).append(td)
+    } 
+    table.append(table_row)
 }
 
 function convert_sum(sum) {
@@ -118,8 +91,8 @@ const button = (color, text, handler = () => { }, additionalData = "") => {
 const price_elem = (price) => {
     let id = make_id()
     let element = document.createElement('span')
-    $(element).addClass("greenColor").attr('id', id).html("<b>" + price + "</b>");
-
+    $(element).addClass("greenColor").attr('id', id).html("<b>" + price + "</b> ");
+    $(element).append(sm_near_logo)
     convertNearToUSD(price, id)
 
     return $(element).prop('outerHTML');
@@ -128,4 +101,15 @@ const price_elem = (price) => {
 function make_id() {
     var id = "id" + Math.random().toString(16).slice(2)
     return id
+}
+function scrollToAnchor(aid){
+    var aTag = $("[name='"+ aid +"']");
+    $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+}
+
+function showErrorMessage(msg) {
+    showUsageOfLocalDumpInfoDiv()
+    $("#errorInfoScreen").show()
+    $("#errorContainer").append(msg)
+    $("#errorContainer").append("<br>")
 }
