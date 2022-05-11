@@ -145,7 +145,7 @@ function setListOfOffers() {
                 }
                 else {
                     _button = button("green", "Принять", () => {
-                        $("#nearDemandValueInput").val(number_from_scientific_notation(element.price))
+                        $("#nearDemandValueInput").val(number_from_scientific_notation(offer.price))
                         scrollToAnchor("nearDemandValueInput")
                     })
                 }

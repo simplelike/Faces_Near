@@ -3,7 +3,12 @@ use crate::*;
 #[near_bindgen]
 impl Contract {
     //Публикация
+    #[payable]
     pub fn nft_on_approve(&mut self, token_id: &TokenId, approval_id: u64, msg: String) {
+
+        //measure the initial storage being used on the contract
+        let initial_storage_usage = env::storage_usage();
+
         //Берем цену, которую указал продавец токена
         let master_data: MasterData =
             serde_json::from_str(&msg).expect("nft_on_approve::Error in msg in nft_on_transfer");
@@ -49,6 +54,11 @@ impl Contract {
                 }
             }
         }
+        //calculate the required storage which was the used - initial
+        let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
+
+        //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
+        refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()));
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64, remover: AccountId) {
@@ -155,6 +165,7 @@ impl Contract {
         }
         return None;
     }
+    
 }
 
 

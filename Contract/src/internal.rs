@@ -1,7 +1,10 @@
 use crate::*;
 use near_sdk::CryptoHash;
 use std::mem::size_of;
-
+//convert the royalty percentage and amount to pay into a payout (U128)
+pub(crate) fn royalty_to_payout(royalty_percentage: u32, amount_to_pay: Balance) -> U128 {
+    U128(royalty_percentage as u128 * amount_to_pay / 10_000u128)
+}
 //calculate how many bytes the account ID is taking up
 pub(crate) fn bytes_for_approved_account_id(account_id: &AccountId) -> u64 {
     // The extra 4 bytes are coming from Borsh serialization to store the length of the string.
@@ -77,6 +80,20 @@ pub(crate) fn refund_deposit(storage_used: u64) {
     if refund > 1 {
         Promise::new(env::predecessor_account_id()).transfer(refund);
     }
+}
+
+pub (crate) fn calc_last_deposit(storage_used: u64) -> Balance{
+    let required_cost = env::storage_byte_cost() * Balance::from(storage_used);
+    let attached_deposit = env::attached_deposit();
+    assert!(
+        required_cost <= attached_deposit,
+        "Must attach {} yoctoNEAR to cover storage",
+        required_cost,
+    );
+
+    //get the refund amount from the attached deposit - required cost
+    let refund = attached_deposit - required_cost;
+    return refund;
 }
 
 impl Contract {
@@ -156,6 +173,7 @@ impl Contract {
             //reset the approval account IDs
             approved_account_ids: Default::default(),
             next_approval_id: token.next_approval_id,
+            royalty: token.royalty.clone()
         };
         //insert that new token into the tokens_by_id, replacing the old entry
         self.tokens_by_id.insert(token_id, &new_token);

@@ -21,11 +21,16 @@ pub enum StorageKey {
 
     MaxDemandBid
 }
+
+use crate::internal_fn::*;
+
+mod internal_fn;
 mod offer_db;
 mod offer_db_view_methods;
 mod demand_db;
 mod demand_db_view_methods;
 mod make_deal_mod;
+
 
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -89,11 +94,6 @@ impl Contract {
     }
 }
 
-
-
-fn convert_to_yocto(price: u128) -> u128 {
-    return price * 1_000_000_000_000_000_000_000_000
-}
 
 
 

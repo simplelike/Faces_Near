@@ -58,8 +58,10 @@ impl Contract {
             env::log_str(&"NFT transfer completed successfully");
  
             //Перевод денег по demand_id
-                
-            if self.pay_at_bet(&demand_id) {
+            let user = self.offer.get(&token_id).expect("on_nft_transfer:: there is no such offer").sailer;
+            let balance = self.demand.get(&demand_id).expect("pay_at_played_bet:: there is no such demandId").price;
+
+            if self.pay_at_bet(&user, balance) {
                 env::log_str(&"Money transfer completed successfully");
                 //Удаляем offer по которому совершается покупка
                 let sailer = self.offer.get(&token_id).expect("on_nft_transfer::there is no such token_id").sailer;
@@ -77,12 +79,15 @@ impl Contract {
 
     #[private]
     #[payable]
-    pub fn pay_at_bet(&mut self, demand_id: &DemandId) -> bool {
+    pub fn pay_at_bet(&mut self, to: &AccountId, balance: Balance) -> bool {
 
-        let user = self.demand.get(&demand_id).expect("pay_at_played_bet:: there is no such demandId").buyer_acc;
-        let balance = self.demand.get(&demand_id).expect("pay_at_played_bet:: there is no such demandId").price;
+        // let token_id = self.demand.get(&demand_id).expect("pay_at_played_bet:: there is no such demandId in token_id").token_id;
+        // let user = self.offer.get(&token_id).expect("pay_at_played_bet:: there is no such offer").sailer; 
+        
+        // //let user = self.demand.get(&demand_id).expect("pay_at_played_bet:: there is no such demandId").buyer_acc;
+        // let balance = self.demand.get(&demand_id).expect("pay_at_played_bet:: there is no such demandId").price;
 
-        Promise::new(user).transfer(balance);
+        Promise::new(to.clone()).transfer(balance);
 
         return true
     }

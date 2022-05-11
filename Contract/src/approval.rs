@@ -87,22 +87,24 @@ impl NonFungibleTokenCore for Contract {
         //insert the token back into the tokens_by_id collection
         self.tokens_by_id.insert(&token_id, &token);
 
-        //refund any excess storage attached by the user. If the user didn't attach enough, panic.
-        refund_deposit(storage_used);
-
         //if some message was passed into the function, we initiate a cross contract call on the
         //account we're giving access to.
         if let Some(msg) = msg {
+            let last_deposit = calc_last_deposit(storage_used);
             ext_non_fungible_approval_receiver::nft_on_approve(
                 token_id,
                 token.owner_id,
                 approval_id,
                 msg,
                 account_id,                               //contract account we're calling
-                NO_DEPOSIT,                               //NEAR deposit we attach to the call
+                last_deposit,                               //NEAR deposit we attach to the call
                 env::prepaid_gas() - GAS_FOR_NFT_APPROVE, //GAS we're attaching
             )
             .as_return(); // Returning this promise
+        }
+        else {
+            //refund any excess storage attached by the user. If the user didn't attach enough, panic.
+        refund_deposit(storage_used);
         }
     }
 

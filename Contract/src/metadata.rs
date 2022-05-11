@@ -44,6 +44,8 @@ pub struct Token {
     pub approved_account_ids: HashMap<AccountId, u64>,
     //the next approval ID to give out. 
     pub next_approval_id: u64,
+
+    pub royalty: HashMap<AccountId, u32>,
 }
 
 //The Json token is what will be returned from view calls. 
@@ -57,6 +59,7 @@ pub struct JsonToken {
      //token metadata
      pub metadata: TokenMetadata,
      pub approved_account_ids: HashMap<AccountId, u64>,
+     pub royalty: HashMap<AccountId, u32>,
 }
 
 //The Json token is what will be returned from view calls. 

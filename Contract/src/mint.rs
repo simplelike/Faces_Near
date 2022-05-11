@@ -1,9 +1,9 @@
 use crate::*;
 
-
+const ROYALTY_FEE:u32 = 200;
 #[near_bindgen]
 impl Contract {
-
+    
     #[payable]
     pub fn nft_mint(
         &mut self,
@@ -14,6 +14,9 @@ impl Contract {
         //measure the initial storage being used on the contract
         let initial_storage_usage = env::storage_usage();
 
+        let mut royalty = HashMap::new();
+        royalty.insert(receiver_id.clone(), ROYALTY_FEE);
+
         //specify the token struct that contains the owner ID 
         let token = Token {
             //set the owner ID equal to the receiver ID passed into the function
@@ -21,6 +24,7 @@ impl Contract {
             approved_account_ids: Default::default(),
             //the next approval ID is set to 0
             next_approval_id: 0,
+            royalty: royalty
         };
 
         //insert the token ID and token struct and make sure that the token doesn't exist
@@ -42,7 +46,7 @@ impl Contract {
         refund_deposit(required_storage_in_bytes);
     }
 
-    #[payable]
+    /*#[payable]
     pub fn nft_batch_mint(&mut self, innerdData: String)   
     {
         let initial_storage_usage = env::storage_usage();
@@ -82,5 +86,5 @@ impl Contract {
         //refund_deposit(required_storage_in_bytes);
         }
 
-    }
+    }*/
 }

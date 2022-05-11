@@ -25,15 +25,20 @@ impl Contract {
         if let Some(demand_set) = self.demand_acc_ind.get(&buyer) {
             if let Some(demand_id) = self.is_there_any_value_in(&demand_set, &token_id) {
                 env::log_str("There is old demand from this buyer on this token");
-                let mut demand = self
+                let demand = self
                     .demand
                     .get(&demand_id)
                     .expect("make_demand_for_buying_token:: there is no such demandId. Arch err?");
-                demand.price = price;
+                //demand.price = price;
                 //Если есть - удаляем
-                self.remove_demand_id_from_demand_token_id(&token_id, &demand_id);
-                self.remove_demand_id_from_demand_acc_id(&buyer, &demand_id);
-                self.demand.remove(&demand_id);
+                //Но сначала возвращаем старую ставку
+                if self.pay_at_bet(&buyer, demand.price) {
+                    env::log_str("Old demand returned");
+                    self.remove_demand_id_from_demand_token_id(&token_id, &demand_id);
+                    self.remove_demand_id_from_demand_acc_id(&buyer, &demand_id);
+                    self.demand.remove(&demand_id);
+                }
+                
                 //self.demand.insert(&demand_id, &demand);
 
                 //d_id = Some(demand_id);
@@ -76,7 +81,7 @@ impl Contract {
             if remover != demand.buyer_acc {
                 env::panic_str("remover must be the owner of demand ");
             }
-            if self.pay_at_bet(&demand_id) {
+            if self.pay_at_bet(&remover, demand.price) {
                 self.remove_demand_id_from_demand_token_id(
                     &self
                         .demand

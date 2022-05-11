@@ -305,7 +305,7 @@ async function makeOffer(token_id, deposit) {
                 msg: JSON.stringify(dep)
             },
             "300000000000000",
-            "300000000000000000000"
+            "3000000000000000000000"
         )
         resolve(_result)
         reject("error")
