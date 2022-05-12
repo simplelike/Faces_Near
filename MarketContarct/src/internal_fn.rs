@@ -1,5 +1,11 @@
 use crate::*;
 
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct Payout {
+    pub payout: HashMap<AccountId, u128>,
+} 
+
 fn convert_to_yocto(price: u128) -> u128 {
     return price * 1_000_000_000_000_000_000_000_000
 }

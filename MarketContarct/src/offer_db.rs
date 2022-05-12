@@ -47,6 +47,7 @@ impl Contract {
                     //Берем самое раннее предложение
                     let min_demand_id = self.find_min_demand_id_in(&demands_vec);
                     //Совершаем сделку по найденному id предложения о покупке
+                    
                     self.make_the_deal_for(&min_demand_id);
                 } else {
                     env::log_str("set is empty?");
@@ -55,10 +56,13 @@ impl Contract {
             }
         }
         //calculate the required storage which was the used - initial
-        let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
+        if env::storage_usage() > initial_storage_usage {
+            let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
 
-        //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
-        refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()));
+            //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
+            refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()));
+        }
+        
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64, remover: AccountId) {

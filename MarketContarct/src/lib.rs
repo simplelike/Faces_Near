@@ -4,7 +4,7 @@ use near_sdk::json_types::U128;
 
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, Promise, ext_contract, near_bindgen, AccountId, Balance, Gas, PromiseResult};
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 pub type TokenId = String;
 pub type DemandId = u128;

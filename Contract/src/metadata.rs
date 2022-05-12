@@ -4,7 +4,7 @@ pub type TokenId = String;
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct Payout {
-    pub payout: HashMap<AccountId, U128>,
+    pub payout: HashMap<AccountId, u128>,
 } 
 
 #[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, Clone)]

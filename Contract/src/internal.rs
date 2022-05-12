@@ -2,8 +2,8 @@ use crate::*;
 use near_sdk::CryptoHash;
 use std::mem::size_of;
 //convert the royalty percentage and amount to pay into a payout (U128)
-pub(crate) fn royalty_to_payout(royalty_percentage: u32, amount_to_pay: Balance) -> U128 {
-    U128(royalty_percentage as u128 * amount_to_pay / 10_000u128)
+pub(crate) fn royalty_to_payout(royalty_percentage: u32, amount_to_pay: Balance) -> u128 {
+    royalty_percentage as u128 * amount_to_pay / 10_000u128
 }
 //calculate how many bytes the account ID is taking up
 pub(crate) fn bytes_for_approved_account_id(account_id: &AccountId) -> u64 {

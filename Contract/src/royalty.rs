@@ -10,9 +10,9 @@ pub trait NonFungibleTokenCore {
         receiver_id: AccountId,
         token_id: TokenId,
         approval_id: u64,
-        memo: String,
-        balance: U128,
+        balance: Balance,
         max_len_payout: u32,
+        memo: Option<String>,
     ) -> Payout;
 }
 
@@ -56,11 +56,11 @@ impl NonFungibleTokenCore for Contract {
             }
         }
 
-        // payout to previous owner who gets 100% - total perpetual royalties
-        payout_object.payout.insert(
-            owner_id,
-            royalty_to_payout(10000 - total_perpetual, balance_u128),
-        );
+        // // payout to previous owner who gets 100% - total perpetual royalties
+        // payout_object.payout.insert(
+        //     owner_id,
+        //     royalty_to_payout(10000 - total_perpetual, balance_u128),
+        // );
 
         //return the payout object
         return payout_object;
@@ -73,9 +73,9 @@ impl NonFungibleTokenCore for Contract {
         receiver_id: AccountId,
         token_id: TokenId,
         approval_id: u64,
-        memo: String,
-        balance: U128,
+        balance: Balance,
         max_len_payout: u32,
+        memo: Option<String>,
     ) -> Payout {
         //assert that the user attached 1 yocto NEAR for security reasons
         assert_one_yocto();
@@ -83,7 +83,7 @@ impl NonFungibleTokenCore for Contract {
         let sender_id = env::predecessor_account_id();
         //transfer the token to the passed in receiver and get the previous token object back
         let previous_token =
-            self.internal_transfer(&sender_id, &receiver_id, &token_id, Some(approval_id), Some(memo));
+            self.internal_transfer(&sender_id, &receiver_id, &token_id, Some(approval_id), memo);
 
         //refund the previous token owner for the storage used up by the previous approved account IDs
         refund_approved_account_ids(
@@ -124,11 +124,11 @@ impl NonFungibleTokenCore for Contract {
             }
         }
 
-        // payout to previous owner who gets 100% - total perpetual royalties
-        payout_object.payout.insert(
-            owner_id,
-            royalty_to_payout(10000 - total_perpetual, balance_u128),
-        );
+        // // payout to previous owner who gets 100% - total perpetual royalties
+        // payout_object.payout.insert(
+        //     owner_id,
+        //     royalty_to_payout(10000 - total_perpetual, balance_u128),
+        // );
 
         //return the payout object
         return payout_object;
