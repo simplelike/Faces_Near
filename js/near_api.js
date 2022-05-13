@@ -1,6 +1,6 @@
 const contract_id = 'supremes_nft.testnet'
 
-const market_contract = "market.fg6.testnet"
+const market_contract = "market.supremes_nft.testnet"
 
 
 // connect to NEAR

@@ -52,3 +52,16 @@ pub(crate) fn refund_deposit(storage_used: u64, account_id: Option<AccountId>) {
         }
     }
 }
+
+
+#[near_bindgen]
+impl Contract {
+    pub fn clear_data(&mut self) {
+        self.offer.clear();
+        self.offer_acc_ind.clear();
+
+        self.demand.clear();
+        self.demand_token_ind.clear();
+        self.demand_acc_ind.clear();
+    }
+}

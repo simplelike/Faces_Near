@@ -26,7 +26,7 @@ mod cross_contractCalls;
 
 const LINK_TO_DATA_HASH: &str = "bafybeig3ih2d7dom6xcksapn4ckbjomwz3gx6zxxkisltqhx54s3py6qym";
 const HASH_OF_OBJECT_DATA: &str = "c133bc5f0a2c77bebbc83e1bed1b86f483c9e88b";
-pub const MARKET_ACCOUNT_ID: &str = "market.fg6.testnet";
+pub const MARKET_ACCOUNT_ID: &str = "market.supremes_nft.testnet";
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]

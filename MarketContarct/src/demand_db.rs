@@ -6,6 +6,10 @@ impl Contract {
     pub fn make_demand_for_buying_token(&mut self, token_id: &TokenId) {
         let buyer = env::signer_account_id();
         let price = env::attached_deposit();
+
+        //measure the initial storage being used on the contract
+        let initial_storage_usage = env::storage_usage();
+
         //Проверяем, что приложен депозит к вызову функции
         assert_eq!(
             price > 0,
@@ -72,6 +76,14 @@ impl Contract {
                     &self.demand_id.clone(),
                 );
             }
+        }
+
+         //calculate the required storage which was the used - initial
+         if env::storage_usage() > initial_storage_usage {
+            let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
+
+            //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
+            refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()));
         }
     }
 

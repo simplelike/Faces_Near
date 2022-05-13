@@ -120,8 +120,7 @@ impl Contract {
     #[private]
     #[payable]
     pub fn pay_at_bet(&mut self, to: &AccountId, balance: Balance) -> bool {
-
-
+        
         Promise::new(to.clone()).transfer(balance);
 
         return true

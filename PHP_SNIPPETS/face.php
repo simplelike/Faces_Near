@@ -95,7 +95,7 @@
         </table>
     </div>
     <div id="controlOfferPanel" style="display: none" class="row">
-        <div class="col-4"> <label for="nearOfferValueInput"><b>Введите предложение о продаже в yoctoNear:</b></label></div>
+        <div class="col-4"> <label for="nearOfferValueInput"><b>Введите предложение о продаже в Near:</b></label></div>
         <div class="col-4"> <input id="nearOfferValueInput" name="nearOfferValueInput" type="number" min="0"></div>
     </div>
     <div class="row"  style=" margin-top: 60px; ">
@@ -115,7 +115,7 @@
         </table>
     </div>
     <div id="controlDemandPanel" style="display: none" class="row">
-        <div class="col-4"> <label for="nearDemandValueInput"><b>Введите предложение о покупке в yoctoNear:</b></label></div>
+        <div class="col-4"> <label for="nearDemandValueInput"><b>Введите предложение о покупке в Near:</b></label></div>
         <div class="col-4"> <input id="nearDemandValueInput" name="nearDemandValueInput" type="number" min="0"></div>
     </div>
 </div>

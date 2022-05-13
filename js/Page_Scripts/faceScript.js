@@ -101,7 +101,10 @@ function setListOfOffers() {
                         "Сделать предложение",
                         function () {
                             if ($("#nearOfferValueInput").val() !== "") {
-                                makeOffer(id, $("#nearOfferValueInput").val()).then(
+
+                                let yoctoN_price = nearApi.utils.format.parseNearAmount($("#nearOfferValueInput").val());
+
+                                makeOffer(id, yoctoN_price).then(
                                     error => {
                                         showErrorMessage(error)
                                     }
@@ -145,7 +148,8 @@ function setListOfOffers() {
                 }
                 else {
                     _button = button("green", "Принять", () => {
-                        $("#nearDemandValueInput").val(number_from_scientific_notation(offer.price))
+                        let price_in_near = convert_sum(number_from_scientific_notation(offer.price))
+                        $("#nearDemandValueInput").val(price_in_near)
                         scrollToAnchor("nearDemandValueInput")
                     })
                 }
@@ -181,7 +185,9 @@ function setListOfDemands() {
                             "Сделать предложение",
                             function () {
                                 if ($("#nearDemandValueInput").val() !== "") {
-                                    makeDemandForBuyingToken(id, $("#nearDemandValueInput").val()).then(
+                                    let yoctoN_price = nearApi.utils.format.parseNearAmount($("#nearDemandValueInput").val());
+                                    console.log(yoctoN_price)
+                                    makeDemandForBuyingToken(id, yoctoN_price).then(
                                         error => {
                                             showErrorMessage(error)
                                         }
@@ -232,7 +238,8 @@ function setListOfDemands() {
                         }
                         else {
                             _button = button("green", "Ответить", () => {
-                                $("#nearDemandValueInput").val(number_from_scientific_notation(element.price))
+                                let price_in_near = convert_sum(number_from_scientific_notation(element.price))
+                                $("#nearDemandValueInput").val(price_in_near)
                                 scrollToAnchor("nearDemandValueInput")
                             })
                         }
