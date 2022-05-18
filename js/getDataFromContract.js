@@ -265,35 +265,41 @@ async function doesTokenBelongsToContractAcc(token_id) {
     })
 }
 
-async function nftGetTokenForFree(token_id) {
-    return new Promise((resolve, reject) => {
-        let _result = contract.nft_get_token_for_free(
-            {
-                token_id: token_id,
-            },
-            "300000000000000", // attached GAS (optional)
-            "1" // attached deposit in yoctoNEAR (optional)
-            )
-        resolve(_result)
-        reject("error")
-    })
-}
+// async function nftGetTokenForFree(token_id) {
+//     return new Promise((resolve, reject) => {
+//         let _result = contract.nft_get_token_for_free(
+//             {
+//                 token_id: token_id,
+//             },
+//             "300000000000000", // attached GAS (optional)
+//             "1" // attached deposit in yoctoNEAR (optional)
+//             )
+//         resolve(_result)
+//         reject("error")
+//     })
+// }
 
-async function makeDemandForBuyingToken(token_id, deposit) {
+async function makeDemandForBuyingToken(token_id, deposit, gas = "300000000000000", deposit_value_for_computing = "102800000000000000000000") {
+    let deposit_for_token_in_near = nearApi.utils.format.formatNearAmount(deposit)
+    let deposit_value_for_computing_in_near = nearApi.utils.format.formatNearAmount(deposit_value_for_computing)
+    let deposit_ine_near = Number(deposit_for_token_in_near) + Number(deposit_value_for_computing_in_near)
+
     return new Promise((resolve, reject) => {
         let _result = contract.make_demand_for_buying_token(
             {
                 token_id: token_id,
+                deposit_for_storage: deposit_value_for_computing,
+                deposit_for_token: deposit
             },
-            "300000000000000",
-            deposit
+            gas,
+            nearApi.utils.format.parseNearAmount(String(deposit_ine_near))
             )
         resolve(_result)
         reject("error")
     })
 }
 
-async function makeOffer(token_id, deposit) {
+async function makeOffer(token_id, deposit, gas = "300000000000000", deposit_value_for_computing = "9000000000000000000000") {
     let dep = {
         price: deposit
     }
@@ -304,8 +310,8 @@ async function makeOffer(token_id, deposit) {
                 account_id: market_contract,
                 msg: JSON.stringify(dep)
             },
-            "300000000000000",
-            "9000000000000000000000"
+            gas,
+            deposit_value_for_computing
         )
         resolve(_result)
         reject("error")
@@ -319,7 +325,7 @@ async function remove_demand_id(demand_id) {
                 demand_id: demand_id,
             },
             "300000000000000",
-            "100000000000000000000"
+            "1"
         )
         resolve(_result)
         reject("error")

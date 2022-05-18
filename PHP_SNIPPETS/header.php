@@ -22,7 +22,13 @@
                 <a class="nav-link" href="/myCollection.php">Моя коллекция </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="signInButton" href="#"></a>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="wallet_register_text" data-toggle="dropdown" aria-expanded="false"></button>
+                    <div class="dropdown-menu" aria-labelledby="wallet_register_text">
+                        <a class="dropdown-item" id="wallet_register_button" href="#"></a>
+                    </div>
+                </div>
+                <!--a class="nav-link" id="signInButton" href="#"></a-->
             </li>
             <!--li class="nav-item">
                 <a class="nav-link" id="signInButton" onclick="contractMethodEval();" href="#">Тест </a>

@@ -38,26 +38,28 @@ const contract = new nearApi.Contract(wallet.account(), contract_id, {
 
 $(window).load(function () {
 
-    let signInButton = $("#signInButton")
+    let signInButton = $("#wallet_register_button")
+    let signInTextElement = $("#wallet_register_text")
 
     if (wallet.isSignedIn()) {
         let textForSignInButton = "Вы вошли как "
-        signInButton.html(textForSignInButton + wallet.getAccountId())
+        signInTextElement.html(textForSignInButton + wallet.getAccountId())
+
+        signInButton.html("Выйти")
     }
     else {
-        signInButton.html('Войти в систему');
+        signInTextElement.html('Войти в систему');
+        signInButton.html("Войти")
     }
 
     signInButton.click(function () {
 
         if (wallet.isSignedIn()) {
             wallet.signOut();
-            signInButton.html('Войти в систему');
+            location.reload();
         }
         else {
             signIn();
-            let textForSignInButton = "Вы вошли как "
-            signInButton.html(textForSignInButton + wallet.getAccountId())
         }
     })
 })
@@ -69,14 +71,14 @@ const logged_user = wallet.getAccountId()
 function signIn() {
     wallet.requestSignIn({
         contractId: contract_id,
-        methodNames: 
-        ['nft_batch_mint',
-        'nft_mint',
-        'make_demand_for_buying_token',
-        'nft_get_token_for_free',
-        'remove_demand_for_buying_token',
-        'nft_approve',
-        'nft_revoke']
+        methodNames: [
+            'nft_batch_mint',
+            'nft_mint',
+            'make_demand_for_buying_token',
+            'nft_get_token_for_free',
+            'remove_demand_for_buying_token',
+            'nft_approve',
+            'nft_revoke'
+        ]
     });
 }
-

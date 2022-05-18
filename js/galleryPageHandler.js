@@ -66,7 +66,17 @@ function fillData() {
 function drawImages(from, to, ) {
     let element = $('#infiniteScroll');
     for (let i = from; i <= to; i++) {
-        element.append(`<div class = "col" style = "margin-bottom: 25px"> <a class = "galleryImgLink" href = "/face.php?id=${parseInt(dataArrCurrent[i].nbr - 1)}" onclick = "clickLinkFunction(event)"><img class="loadingImg" index = "${i}" src = "/previewData/midPreview/${parseInt(dataArrCurrent[i].nbr)}.png"></a></div>`)
+        element.append(`
+                        <div class = "col" style = "margin-bottom: 25px"> 
+                            <div>    
+                                <a class = "galleryImgLink" href = "/face.php?id=${parseInt(dataArrCurrent[i].nbr - 1)}" onclick = "clickLinkFunction(event)">
+                                        <img class="loadingImg" index = "${i}" src = "/previewData/midPreview/${parseInt(dataArrCurrent[i].nbr)}.png">
+                                </a>
+                            </div>
+                            <div class = "mainFont_sign">
+                                SUPREM № ${dataArrCurrent[i].nbr}
+                            </div>
+                        </div>`)
     }
 }
 

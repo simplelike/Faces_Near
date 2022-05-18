@@ -96,15 +96,18 @@ function setListOfOffers() {
                     setOffersForTokenIdTable(offer, true)
 
                     $("#controlOfferPanel").show()
-                    $("#controlOfferPanel").append(button(
+                    $("#offer_input_container_div").append(detail_info_element("offerDetail"))
+                    $("#offer_button_container_div").append(button(
                         "green",
                         "Сделать предложение",
                         function () {
                             if ($("#nearOfferValueInput").val() !== "") {
 
                                 let yoctoN_price = nearApi.utils.format.parseNearAmount($("#nearOfferValueInput").val());
+                                let gas = $("#offerDetail [name = gas_input]").val()
+                                let deposit = $("#offerDetail [name = deposit_select]").val()
 
-                                makeOffer(id, yoctoN_price).then(
+                                makeOffer(id, yoctoN_price, gas, deposit).then(
                                     error => {
                                         showErrorMessage(error)
                                     }
@@ -180,14 +183,16 @@ function setListOfDemands() {
                     //И можем делать ставки на покупку токена
                     if (wallet.isSignedIn()) {
                         $("#controlDemandPanel").show()
-                        $("#controlDemandPanel").append(button(
+                        $("#demand_input_container_div").append(detail_info_element("demandDetail"))
+                        $("#demand_button_container_div").append(button(
                             "green",
                             "Сделать предложение",
                             function () {
                                 if ($("#nearDemandValueInput").val() !== "") {
                                     let yoctoN_price = nearApi.utils.format.parseNearAmount($("#nearDemandValueInput").val());
-                                    console.log(yoctoN_price)
-                                    makeDemandForBuyingToken(id, yoctoN_price).then(
+                                    let gas = $("#demandDetail [name = gas_input]").val()
+                                    let deposit = $("#demandDetail [name = deposit_select]").val()
+                                    makeDemandForBuyingToken(id, yoctoN_price, gas, deposit).then(
                                         error => {
                                             showErrorMessage(error)
                                         }

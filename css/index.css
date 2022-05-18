@@ -313,7 +313,7 @@ button {
     border: none;
     padding: 10px;
     /* color: #212529; */
-    border-radius: 7px !important;
+    /*border-radius: 7px !important;*/
     font-size: 18px !important;
 }
 
@@ -333,4 +333,22 @@ table tbody tr {
 }
 table tbody tr:hover {
     background: #e1e1e1;
+}
+
+.mainFont_sign {
+    font-family: 'GillSansUltra', sans-serif;
+    padding-top: 10px;
+    font-size: 16px;
+}
+
+.detail-info {
+    background: rgb(222, 226, 230);
+    padding: 10px;
+    border-radius: 5px;
+    display: block;
+    font-size: 12px;
+}
+
+.detail-info input {
+    width: 100%;
 }

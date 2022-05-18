@@ -3,10 +3,11 @@ use crate::*;
 #[near_bindgen]
 impl Contract {
     #[payable]
-    pub fn make_demand_for_buying_token(&mut self, token_id: &TokenId) {
+    pub fn make_demand_for_buying_token(&mut self, token_id: &TokenId, deposit_for_storage: Balance, deposit_for_token: Balance) {
         let buyer = env::signer_account_id();
-        let price = env::attached_deposit();
-
+        let price = deposit_for_token;
+        let attached_deposit = env::attached_deposit();
+        assert_eq!(attached_deposit >= Balance::from(deposit_for_storage) + Balance::from(deposit_for_token), true, "make_demand_for_buying_token: attached deposit is less or then deposit_for_token + deposit_for_storage");
         //measure the initial storage being used on the contract
         let initial_storage_usage = env::storage_usage();
 
@@ -83,11 +84,12 @@ impl Contract {
             let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
 
             //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
-            refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()));
+            refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()), Some(deposit_for_storage));
         }
     }
 
     pub fn remove_demand_for_buying_token(&mut self, demand_id: &DemandId) {
+        let initial_storage_usage = env::storage_usage();
         if let Some(demand) = self.demand.get(&demand_id) {
             let remover = env::signer_account_id();
             if remover != demand.buyer_acc {
@@ -111,6 +113,14 @@ impl Contract {
                     &demand_id,
                 );
                 self.demand.remove(&demand_id);
+            }
+        }
+        if env::storage_usage() < initial_storage_usage {
+            let delta_in_storage = initial_storage_usage - env::storage_usage();
+            let deposit_in_storage_to_refund = env::storage_byte_cost() * Balance::from(delta_in_storage);
+            if deposit_in_storage_to_refund > 1 {
+                Promise::new(env::predecessor_account_id()).transfer(deposit_in_storage_to_refund);
+                env::log_str("Refund after deleting complete to ");
             }
         }
     }

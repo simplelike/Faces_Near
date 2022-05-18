@@ -96,7 +96,8 @@
     </div>
     <div id="controlOfferPanel" style="display: none" class="row">
         <div class="col-4"> <label for="nearOfferValueInput"><b>Введите предложение о продаже в Near:</b></label></div>
-        <div class="col-4"> <input id="nearOfferValueInput" name="nearOfferValueInput" type="number" min="0"></div>
+        <div class="col-4" id = "offer_input_container_div"> <input id="nearOfferValueInput" name="nearOfferValueInput" type="number" min="0"></div>
+        <div class="col-4" id = "offer_button_container_div"></div>
     </div>
     <div class="row"  style=" margin-top: 60px; ">
         <div class="col-12">
@@ -116,7 +117,8 @@
     </div>
     <div id="controlDemandPanel" style="display: none" class="row">
         <div class="col-4"> <label for="nearDemandValueInput"><b>Введите предложение о покупке в Near:</b></label></div>
-        <div class="col-4"> <input id="nearDemandValueInput" name="nearDemandValueInput" type="number" min="0"></div>
+        <div class="col-4" id = "demand_input_container_div"> <input id="nearDemandValueInput" name="nearDemandValueInput" type="number" min="0"></div>
+        <div class="col-4" id = "demand_button_container_div"></div>
     </div>
 </div>
 
