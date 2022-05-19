@@ -28,6 +28,28 @@ impl Contract {
         };
         //Обновляем таблицу предложений о продаже
         self.update_offer_db(&token_id, &new_sail_announcement, &sailer);
+
+        //Прверим, что приложенного депозита к функции достаточно, чтобы оплатить storage
+        //Если достаточно - проверим не нужно ли часть вернуть пользователю и если нужно-вернем
+        //Если нет - удалим размещенное объявление и оповестим пользователя через assert
+        if env::storage_usage() > initial_storage_usage {
+            let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
+            let required_cost = env::storage_byte_cost() * Balance::from(required_storage_in_bytes);
+            let attached_deposit:Balance =env::attached_deposit();
+            if required_cost > attached_deposit {
+                self.take_off_sale(&token_id, approval_id.clone(), env::signer_account_id());
+                env::panic_str(
+                    format!("Must attach {} yoctoNEAR to cover storage", required_cost).as_str()
+                );
+            }
+            
+            let refund = attached_deposit - required_cost;
+            if refund > 1 {
+                Promise::new(env::signer_account_id()).transfer(refund);
+                env::log_str(format!("Refund {} completed", refund).as_str());
+            }
+        }
+
         //Проверяем, есть ли предложения о покупке
         if let Some(_) = self.demand_token_ind.get(&token_id) {
             //Берем максимальную цену о покупке
@@ -55,17 +77,13 @@ impl Contract {
                 }
             }
         }
-        //calculate the required storage which was the used - initial
-        if env::storage_usage() > initial_storage_usage {
-            let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
-
-            //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
-            refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()), None);
-        }
-        
     }
 
     pub fn take_off_sale(&mut self, token_id: &TokenId, approval_id: u64, remover: AccountId) {
+        
+        let initial_storage_usage = env::storage_usage();
+
+        assert_eq!(remover == env::signer_account_id(), true, "signer must be equal to remover");
         if let Some(offer) = self.offer.get(&token_id) {
             assert_eq!(
                 offer.sailer, remover,
@@ -77,6 +95,17 @@ impl Contract {
             );
             self.offer.remove(&token_id);
             self.delete_from_offer_acc_ind_for(&token_id, &offer.sailer);
+            env::log_str("Offer removed");
+
+
+            //Вернем депозит за storage
+            if env::storage_usage() < initial_storage_usage {
+                let required_storage_in_bytes = initial_storage_usage - env::storage_usage();
+                let required_cost = env::storage_byte_cost() * Balance::from(required_storage_in_bytes);
+                
+                Promise::new(env::signer_account_id()).transfer(required_cost);
+                env::log_str(format!("Refund {} completed", required_cost).as_str());
+            }
         }
     }
 }

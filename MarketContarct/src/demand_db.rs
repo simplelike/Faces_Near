@@ -43,10 +43,6 @@ impl Contract {
                     self.remove_demand_id_from_demand_acc_id(&buyer, &demand_id);
                     self.demand.remove(&demand_id);
                 }
-                
-                //self.demand.insert(&demand_id, &demand);
-
-                //d_id = Some(demand_id);
             }
         }
         //Создаем новое предложение
@@ -65,6 +61,26 @@ impl Contract {
 
         env::log_str("New demand created...");
 
+        //Прверим, что приложенного депозита к функции достаточно, чтобы оплатить storage
+        //Если достаточно - проверим не нужно ли часть вернуть пользователю и если нужно-вернем
+        //Если нет - удалим размещенное объявление и оповестим пользователя через assert
+        if env::storage_usage() > initial_storage_usage {
+            let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
+            let required_cost = env::storage_byte_cost() * Balance::from(required_storage_in_bytes);
+            if required_cost > deposit_for_storage {
+                self.remove_demand_for_buying_token(&self.demand_id.clone());
+                env::panic_str(
+                    format!("Must attach {} yoctoNEAR to cover storage", required_cost).as_str()
+                );
+            }
+            
+            let refund = deposit_for_storage - required_cost;
+            if refund > 1 {
+                Promise::new(env::signer_account_id()).transfer(refund);
+                env::log_str(format!("Refund for make demand {} completed", refund).as_str());
+            }
+        }
+
         //Проверяю есть ли оффер на этот токен, если да - совершаю сделку по demand_id
         if let Some(offer_for_token) = self.offer.get(&token_id) {
             env::log_str("Offer exist");
@@ -77,14 +93,6 @@ impl Contract {
                     &self.demand_id.clone(),
                 );
             }
-        }
-
-         //calculate the required storage which was the used - initial
-         if env::storage_usage() > initial_storage_usage {
-            let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
-
-            //refund any excess storage if the user attached too much. Panic if they didn't attach enough to cover the required.
-            refund_deposit(required_storage_in_bytes, Some(env::signer_account_id()), Some(deposit_for_storage));
         }
     }
 
@@ -119,8 +127,8 @@ impl Contract {
             let delta_in_storage = initial_storage_usage - env::storage_usage();
             let deposit_in_storage_to_refund = env::storage_byte_cost() * Balance::from(delta_in_storage);
             if deposit_in_storage_to_refund > 1 {
-                Promise::new(env::predecessor_account_id()).transfer(deposit_in_storage_to_refund);
-                env::log_str("Refund after deleting complete to ");
+                Promise::new(env::signer_account_id()).transfer(deposit_in_storage_to_refund);
+                env::log_str("Refund after deleting demand complete");
             }
         }
     }

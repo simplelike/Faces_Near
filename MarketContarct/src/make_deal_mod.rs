@@ -76,6 +76,8 @@ impl Contract {
             PromiseResult::Successful(result) => {
                 env::log_str(&"NFT transfer completed successfully");
 
+                let mut initial_storage_usage = env::storage_usage();
+
                 //Получаем объект payout, где указаны royalty
                 let payout:Payout = near_sdk::serde_json::from_slice::<Payout>(&result).unwrap();
 
@@ -101,12 +103,33 @@ impl Contract {
                     let sailer = self.offer.get(&token_id).expect("on_nft_transfer::there is no such token_id").sailer;
                     self.offer.remove(&token_id);
                     self.delete_from_offer_acc_ind_for(&token_id, &sailer);
+
+                    //Вернем деньги за storage пользователю, который размещал offer
+                    if env::storage_usage() < initial_storage_usage {
+                        let required_storage_in_bytes = initial_storage_usage - env::storage_usage();
+                        let required_cost = env::storage_byte_cost() * Balance::from(required_storage_in_bytes);
+
+                        //Перезапишем значение initial_storage_usege чтобы после удаления информации из таблицы demand посчитать корректную разницу
+                        initial_storage_usage = env::storage_usage();
+
+                        Promise::new(sailer.clone()).transfer(required_cost);
+                        env::log_str(format!("Refund for offer {} completed", required_cost).as_str());
+                    }
             
                     //Удаляем сыгравшее предложение из таблиц demand
+                    let demander = self.demand.get(&demand_id).expect("Arch error!!! There is No demand?").buyer_acc;
                     self.remove_demand_id_from_demand_token_id(&token_id, &demand_id);
                     self.remove_demand_id_from_demand_acc_id(&sailer, &demand_id);
             
                     self.demand.remove(&demand_id);
+                    //Вернем деньги за storage пользователю, который размещал demand
+                    if env::storage_usage() < initial_storage_usage {
+                        let required_storage_in_bytes = initial_storage_usage - env::storage_usage();
+                        let required_cost = env::storage_byte_cost() * Balance::from(required_storage_in_bytes);
+
+                        Promise::new(demander.clone()).transfer(required_cost);
+                        env::log_str(format!("Refund for demand {} completed", required_cost).as_str());
+                    }
                 }
                 
                 //Переведем деньги всем по roaylaty (скорее всего там один человек, но на всякий случай)
